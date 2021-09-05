@@ -1,0 +1,34 @@
+Criar uma imagem igual ao mapa, mas sem detalhes, somente com os tiles 8x8.
+Cada tile terá uma cor específica.
+
+(as cores abaixo são só exemplo, podem mudar)
+PRETO = parede
+BRANCO = nada
+VERMELHO = morango (talvez seja mais interessante separar o morango da colisão, a discutir)
+AZUL = espinho (ao colidir com o espinho, morre)
+
+Criar um script (em python?) que traduza a imagem pra um .s com cada tile 8x8 sendo representado por 1 byte.
+
+** Talvez esse script deva traduzir essa imagem pra .s de maneira horizontal e vertical?
+
+EXEMPLO
+
+X = personagem
+0 = nada
+1 = parede
+
+MAPA HORIZONTAL
+
+0 0 0 1
+0 X X 1
+0 X X 1
+0 X X 1
+1 1 1 1
+
+MAPA VERTICAL
+
+1 0 0 0 0
+1 X X X 0
+1 X X X 0
+1 1 1 1 1
+

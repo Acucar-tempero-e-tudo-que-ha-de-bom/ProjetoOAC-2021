@@ -6,7 +6,9 @@
 # Posicao do personagem
 # x, y
 #
-CHAR_POS:	.half 16,120
+
+CHAR_POS:	.float 8, 112
+CHAR_VEL:	.float 0, 0
 
 .text		
 		# Open MAPA file
@@ -23,6 +25,14 @@ CHAR_POS:	.half 16,120
 		mv s2,a0
 
 		li s1,1
+		
+		la t0,CHAR_POS
+		flw fs0,0(t0)		# fs0 = char x
+		flw fs1,4(t0)		# fs1 = char y
+		
+		la t0,CHAR_VEL
+		flw fs2,0(t0)		# fs2 = char x vel
+		flw fs3,4(t0)		# fs3 = char y vel
 
 		#
 		# Registradores que devem permanecer durante o loop
@@ -30,14 +40,14 @@ CHAR_POS:	.half 16,120
 		# s0 = MAPA file descriptor
 		# s1 = current frame
 		# s2 = CHAR file descriptor
+		# s6 = delta time
 		# s7 = last frame time
 		#
 		# Registradores salvos entre a renderizacao do mapa e a do personagem
 		# s3 = map x
 		# s4 = map y
 		#
-GAME_LOOP:	call INPUT
-
+GAME_LOOP:	
 		#
 		# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
 		# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
@@ -46,13 +56,22 @@ GAME_LOOP:	call INPUT
 		sub t0,t0,s7			# t0 = current time - last frame time
 		li t1,16			# 16ms entre cada frame (1000ms/60fps)
 		bltu t0,t1,GAME_LOOP		# enquanto n tiver passado 16ms, repete
+		mv s6,t0
 		
+		call INPUT
+
+		li t1,1000
+		fcvt.s.w ft0, t1		# ft0 = 1000
+		fcvt.s.w fa2, s6		# fa0 = delta time (in ms)
+		fdiv.s fa2, fa2, ft0		# fa0 /= 1000 (delta time in seconds)
+		call PHYSICS
+	
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
-		la t0,CHAR_POS
-		
+
 		# Calculo do x
-		lhu a0,0(t0)			# a0 = char x
+		fcvt.w.s a0,fs0			# a0 = char x
+
 		addi a0,a0,MAP_OFFSET_X		# a0 = char x - offset x do mapa (o mapa fica x pixels pra esquerda do personagem)
 		mv a1,zero			# a1 = 0
 		call MAX			# faz um MAX entre o resultado da conta e 0 (garante que o x do mapa seja >= 0)
@@ -63,7 +82,7 @@ GAME_LOOP:	call INPUT
 		mv s3,a0			# move o resultado pra s3
 		
 		# Calculo do y
-		lhu a0,2(t0)			# a0 = char y
+		fcvt.w.s a0,fs1			# a0 = char y
 		addi a0,a0,MAP_OFFSET_Y		# a0 = char y - offset y do mapa (o mapa fica x pixels pra cima do personagem)
 		mv a1,zero			# a1 = zero
 		call MAX			# faz um MAX entre o resultado da conta e 0 (garante que o y do mapa seja >= 0)
@@ -89,13 +108,13 @@ GAME_LOOP:	call INPUT
 		mv a0,s2
 		
 		# Calculo da posicao do personagem na tela em relacao ao mapa
-		la t0,CHAR_POS
+
 		# x = char x - map x
-		lhu a1,0(t0)
+		fcvt.w.s a1,fs0
 		sub a1,a1,s3
 		
 		# y = char y - map y
-		lhu a2,2(t0)
+		fcvt.w.s a2,fs1
 		sub a2,a2,s4
 		
 		la a3,FILE_CHAR_SIZE
@@ -134,10 +153,13 @@ EXIT:		# Closes MAPA file
 INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
 		lw t0,0(t1)		
 		andi t0,t0,1	
-  	 	beqz t0,INPUT_RET	# se nao tiver input, retorna
+  	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
  
 		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
 		
+		li t1,4
+		fcvt.s.w ft1,t1
+			
   		# compara pra saber qual input foi
   		li t1,'w'
   		beq t0,t1,INPUT_W
@@ -149,31 +171,32 @@ INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
   		beq t0,t1,INPUT_D
   		li t1,'p'
   		beq t0,t1,EXIT
+  		
+INPUT_ZERO:	fcvt.s.w fs2,zero
 
 INPUT_RET:	ret
 
-INPUT_W:	la t0,CHAR_POS
-		lhu t1,2(t0)
-		addi t1,t1,-4	# y -= 4
-		sh t1,2(t0)
+INPUT_W:	#la t0,CHAR_STATUS
+		li t1,1
+		sb t1,0(t0)
+		
 		j INPUT_RET
 
-INPUT_A:	la t0,CHAR_POS
-		lhu t1,0(t0)
-		addi t1,t1,-4	# x -= 4
-		sh t1,0(t0)
+INPUT_A:	li t0,-1
+		fcvt.s.w fs2,t0
+		
 		j INPUT_RET
 
-INPUT_S:	la t0,CHAR_POS
-		lhu t1,2(t0)
-		addi t1,t1,4	# y += 4
-		sh t1,2(t0)
+INPUT_S:	#la t0,CHAR_STATUS
+		li t1,3
+		sb t1,0(t0)
+		
 		j INPUT_RET
 
-INPUT_D:	la t0,CHAR_POS
-		lhu t1,0(t0)
-		addi t1,t1,4	# x += 4
-		sh t1,0(t0)
+INPUT_D:	li t0,1
+		fcvt.s.w fs2,t0
+		
 		j INPUT_RET
 
 .include "helpers/procs.s"
+.include "helpers/physics.s"

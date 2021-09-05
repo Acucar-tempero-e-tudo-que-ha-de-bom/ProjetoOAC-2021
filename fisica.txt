@@ -1,0 +1,30 @@
+deltaTime = tempo em segundos entre cada iteração do loop (a gente ja tem o tempo em ms, talvez seja só dividir por 1000?)
+charVelocity = dois floats representando a velocidade do jogador (x, y)
+charPos = dois floats representando a posição do jogador (x, y)
+
+
+TODO FRAME DEVE-SE CALCULAR A NOVA POSIÇÃO DO JOGADOR:
+charPos += charVelocity * deltaTime (suavização do movimento do jogador)
+^ a gente pode usar a instrução fmadd.s pra calcular isso:
+- fmadd.s charPos, charVelocity, deltaTime, charPos, dyn
+(essa instrução fmadd.s tem esse argumento chamado dyn, temos que testá-la pra entender esse argumento)
+
+GRAVIDADE:
+Toda iteração deve-se subtrair a velocidade no eixo y do jogador por um valor X
+Essa subtração deve ter um limite máximo, por exemplo, a velocidade maxima que ele pode alcançar é -4
+
+Se detectado uma colisão pra baixo, talvez seja interessante zerar a velocidade do jogador no eixo Y para
+evitar que a velocidade da gravidade acumule e na próxima queda do jogador ele caia extremamente rápido.
+
+Para "counterar" a gravidade no pulo, teoricamente é só definir a velocidade do pulo sendo maior que o valor X
+
+MOVIMENTAÇÃO DO PERSONAGEM:
+Ao pressionar uma tecla, ele automaticamente define a velocidade no jogador no eixo correto.
+Pra criar um efeito de inercia, talvez ao soltar a tecla, o jogador deva ir perdendo velocidade aos poucos.
+
+No pulo, deve-se criar uma flag pra impedir que o usuario segure a tecla de pulo e saia voando.
+
+DASH:
+Teoricamente é só definir a velocidade no eixo pra um valor bem mais alto (?)
+Também deve-se criar uma flag pra impedir multiplos dashs.
+Ao pegar o item que reseta o dash, é só resetar essa flag.

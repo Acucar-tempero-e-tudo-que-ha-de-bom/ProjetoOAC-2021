@@ -17,8 +17,8 @@
 .eqv MAPA_HEIGHT		360
 
 # Tamanho do personagem (char.bin)
-.eqv CHAR_WIDTH			16
-.eqv CHAR_HEIGHT		24
+.eqv CHAR_WIDTH			32
+.eqv CHAR_HEIGHT		32
 
 #
 # Offset do mapa em relação ao personagem
@@ -29,7 +29,7 @@
 # mas acredito que o personagem deveria ficar um pouco mais abaixo da linha do meio,
 # por isso coloquei -120.
 #
-.eqv MAP_OFFSET_X		-152
+.eqv MAP_OFFSET_X		-144
 .eqv MAP_OFFSET_Y		-120
 
 #
@@ -41,3 +41,16 @@
 #
 .eqv MAP_MAX_X			320
 .eqv MAP_MAX_Y			180
+
+
+#
+# Aceleracao em pixeis/s da movimentacao horizontal
+# Velocidade maxima em pixeis/s da movimentacao horizontal
+#
+.eqv MOV_X_ACC_LEFT		-60
+.eqv MOV_X_ACC_RIGHT		60
+.eqv MOV_X_DESACC_LEFT		30
+.eqv MOV_X_DESACC_RIGHT		-30
+
+.eqv MOV_X_MAX_RIGHT		240
+.eqv MOV_X_MAX_LEFT		-240
