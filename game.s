@@ -1,3 +1,12 @@
+# branch anasofia/fisica
+# a ideia eh basicamente formular toda a física do personagem com base em velocidade
+# comecando pela velocidade horizontal (a mais facil)
+# 'd' -> a velocidade incrementa até chegar nesse ponto
+# e aí decrementa até voltar pro estado de repouso
+.eqv	MAX_VEL.X 10
+.eqv	MIN_VEL.Y -10
+
+
 .include "helpers/defs.s"
 .include "helpers/files.s"
 
@@ -6,7 +15,10 @@
 # Posicao do personagem
 # x, y
 #
-CHAR_POS:	.half 16,120
+BRKLN: .string "aeooooooooo\n"
+
+CHAR_POS:	.half 8,112
+CHAO:		.byte 1
 
 .text		
 		# Open MAPA file
@@ -36,7 +48,12 @@ CHAR_POS:	.half 16,120
 		# s3 = map x
 		# s4 = map y
 		#
+		# Registradores salvos para velocidade do personagem
+		# s5 = velocidade vertical
+		# s6 = velocidade horizontal						...me desculpa qualquer coisa
+		#
 GAME_LOOP:	call INPUT
+		
 
 		#
 		# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
@@ -46,6 +63,8 @@ GAME_LOOP:	call INPUT
 		sub t0,t0,s7			# t0 = current time - last frame time
 		li t1,16			# 16ms entre cada frame (1000ms/60fps)
 		bltu t0,t1,GAME_LOOP		# enquanto n tiver passado 16ms, repete
+		
+		jal FISICA
 		
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
@@ -86,6 +105,7 @@ GAME_LOOP:	call INPUT
 		call RENDER
 		
 		# Draw char
+		
 		mv a0,s2
 		
 		# Calculo da posicao do personagem na tela em relacao ao mapa
@@ -131,10 +151,10 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
+INPUT:	li t1,KDMMIO_CONTROL_ADDRESS
 		lw t0,0(t1)		
-		andi t0,t0,1	
-  	 	beqz t0,INPUT_RET	# se nao tiver input, retorna
+		andi t0,t0,1
+  	 	beqz t0,NO_INPUT	# se nao tiver input, retorna
  
 		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
 		
@@ -150,12 +170,16 @@ INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
   		li t1,'p'
   		beq t0,t1,EXIT
 
+NO_INPUT:	#beqz s5, INPUT_RET
+
 INPUT_RET:	ret
 
-INPUT_W:	la t0,CHAR_POS
-		lhu t1,2(t0)
-		addi t1,t1,-4	# y -= 4
-		sh t1,2(t0)
+INPUT_W:	la t0, CHAO
+		sb zero, 0(t0)
+		addi s5, s5, -10
+		la a0, BRKLN
+		li a7, 4
+		ecall
 		j INPUT_RET
 
 INPUT_A:	la t0,CHAR_POS
@@ -170,10 +194,33 @@ INPUT_S:	la t0,CHAR_POS
 		sh t1,2(t0)
 		j INPUT_RET
 
-INPUT_D:	la t0,CHAR_POS
-		lhu t1,0(t0)
-		addi t1,t1,4	# x += 4
-		sh t1,0(t0)
+INPUT_D:	li t0, MAX_VEL.X
+		bge s6, t0, INPUT_RET
+		addi s6, s6, 3
 		j INPUT_RET
+
+FISICA:	
+		la t0, CHAR_POS
+		
+		lhu t1, 0(t0)
+		add t1, t1, s6
+		sh t1, 0(t0)
+		
+		lhu t1,2(t0)
+		add t1,t1,s5
+		sh t1,2(t0)
+		
+		la t0, CHAO
+		lb t1, 0(t0)
+		bnez t1, FISICA_RET
+		addi s5, s5, 1
+		
+FISICA_RET:	ret
+
+MOVE_CHAR.X:
+		ret
+
+MOVE_CHAR.Y:
+		ret
 
 .include "helpers/procs.s"

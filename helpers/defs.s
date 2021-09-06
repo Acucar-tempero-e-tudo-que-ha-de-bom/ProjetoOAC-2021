@@ -17,8 +17,8 @@
 .eqv MAPA_HEIGHT		360
 
 # Tamanho do personagem (char.bin)
-.eqv CHAR_WIDTH			16
-.eqv CHAR_HEIGHT		24
+.eqv CHAR_WIDTH			32
+.eqv CHAR_HEIGHT		32
 
 #
 # Offset do mapa em relação ao personagem
