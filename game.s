@@ -1,5 +1,6 @@
 .include "helpers/defs.s"
 .include "helpers/files.s"
+.include "helpers/data.s"
 
 .data
 #
@@ -8,7 +9,11 @@
 #
 
 CHAR_POS:	.float 8, 112
-CHAR_VEL:	.float 0, 0
+
+MOVEX:		.byte 0
+ONGROUND:	.byte 1
+
+INPUT_IGNORE:	.byte 1
 
 .text		
 		# Open MAPA file
@@ -29,10 +34,9 @@ CHAR_VEL:	.float 0, 0
 		la t0,CHAR_POS
 		flw fs0,0(t0)		# fs0 = char x
 		flw fs1,4(t0)		# fs1 = char y
-		
-		la t0,CHAR_VEL
-		flw fs2,0(t0)		# fs2 = char x vel
-		flw fs3,4(t0)		# fs3 = char y vel
+
+		fcvt.s.w fs2,zero
+		fcvt.s.w fs3,zero
 
 		#
 		# Registradores que devem permanecer durante o loop
@@ -40,15 +44,16 @@ CHAR_VEL:	.float 0, 0
 		# s0 = MAPA file descriptor
 		# s1 = current frame
 		# s2 = CHAR file descriptor
-		# s6 = delta time
 		# s7 = last frame time
+		#
+		# fa7 = delta time
 		#
 		# Registradores salvos entre a renderizacao do mapa e a do personagem
 		# s3 = map x
 		# s4 = map y
 		#
-GAME_LOOP:	
-		#
+
+GAME_LOOP:	#
 		# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
 		# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
 		#
@@ -56,15 +61,14 @@ GAME_LOOP:
 		sub t0,t0,s7			# t0 = current time - last frame time
 		li t1,16			# 16ms entre cada frame (1000ms/60fps)
 		bltu t0,t1,GAME_LOOP		# enquanto n tiver passado 16ms, repete
-		mv s6,t0
-		
-		call INPUT
 
 		li t1,1000
-		fcvt.s.w ft0, t1		# ft0 = 1000
-		fcvt.s.w fa2, s6		# fa0 = delta time (in ms)
-		fdiv.s fa2, fa2, ft0		# fa0 /= 1000 (delta time in seconds)
+		fcvt.s.w ft0, t1                # ft0 = 1000
+		fcvt.s.w fa7, t0                # fa7 = delta time (in ms)
+		fdiv.s fa7, fa7, ft0            # fa7 /= 1000 (delta time in seconds)
+		
 		call PHYSICS
+		call INPUT
 	
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
@@ -150,16 +154,25 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
+INPUT:		#la t1,LAST_INPUT
+		#lb t0,0(t1)
+		#li t2,60
+		#bnez,t0,INPUT_RET
+		
+		#li t0,2
+		#sb t0,0(t1)
+		
+		li t1,KDMMIO_CONTROL_ADDRESS
 		lw t0,0(t1)		
 		andi t0,t0,1	
   	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
  
 		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
 		
-		li t1,4
-		fcvt.s.w ft1,t1
-			
+		li a7,1
+  		li a0,1
+  		ecall
+  		
   		# compara pra saber qual input foi
   		li t1,'w'
   		beq t0,t1,INPUT_W
@@ -172,31 +185,31 @@ INPUT:		li t1,KDMMIO_CONTROL_ADDRESS
   		li t1,'p'
   		beq t0,t1,EXIT
   		
-INPUT_ZERO:	fcvt.s.w fs2,zero
+INPUT_ZERO:	li a7,1
+  		li a0,0
+  		ecall
+  		
+		la t0,MOVEX
+		sb zero,0(t0)
 
 INPUT_RET:	ret
 
-INPUT_W:	#la t0,CHAR_STATUS
+INPUT_W:	j INPUT_RET
+
+INPUT_A:	la t0,MOVEX
+		li t1,-1
+		sb t1,0(t0)
+		
+		j INPUT_RET
+
+INPUT_S:	j INPUT_RET
+
+INPUT_D:	la t0,MOVEX
 		li t1,1
 		sb t1,0(t0)
-		
+
 		j INPUT_RET
 
-INPUT_A:	li t0,-1
-		fcvt.s.w fs2,t0
-		
-		j INPUT_RET
-
-INPUT_S:	#la t0,CHAR_STATUS
-		li t1,3
-		sb t1,0(t0)
-		
-		j INPUT_RET
-
-INPUT_D:	li t0,1
-		fcvt.s.w fs2,t0
-		
-		j INPUT_RET
-
-.include "helpers/procs.s"
+.include "helpers/render.s"
 .include "helpers/physics.s"
+.include "helpers/procs.s"

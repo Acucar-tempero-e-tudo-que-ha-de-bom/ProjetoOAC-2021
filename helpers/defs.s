@@ -54,3 +54,11 @@
 
 .eqv MOV_X_MAX_RIGHT		240
 .eqv MOV_X_MAX_LEFT		-240
+
+
+#
+# Physics
+#
+.eqv MAX_RUN			90
+.eqv RUN_ACCEL			1000
+.eqv RUN_REDUCE			400

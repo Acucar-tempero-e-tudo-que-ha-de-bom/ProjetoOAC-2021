@@ -28,3 +28,17 @@ DASH:
 Teoricamente é só definir a velocidade no eixo pra um valor bem mais alto (?)
 Também deve-se criar uma flag pra impedir multiplos dashs.
 Ao pegar o item que reseta o dash, é só resetar essa flag.
+
+
+
+
+
+6 frames pra acelerar
+
+velocidade maxima = 90
+
+3 frames pra desacelerar
+
+velocidade de pulo = -105
+
+pulo dura 36 frames

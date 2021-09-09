@@ -48,94 +48,46 @@ MIN.F:		fle.s t0, fa0, fa1
 		fmv.s fa0,fa1		# returns fa1
 MIN.F.RET:	ret
 
-###################### PROCEDIMENTO RENDER ######################
+#################### PROCEDIMENTO APPROACH ######################
 #	ARGUMENTOS:						#
-#		a0 = file descriptor				#
-#		a1 = x na tela					#
-#		a2 = y na tela					#
-#		a3 = endereço do tamanho da imagem		#
-#		a4 = endereco do tam. da area de desenho	#
-#		a5 = frame (0 ou 1)				#
-#		a6 = x na imagem				#
-#		a7 = y na imagem				#
+#		fa0 = val					#
+#		fa1 = target					#
+#		fa2 = maxMove					#
+#	RETORNO:						#
+#		retorna em fa0 o novo valor			#
 #################################################################
 
-#
-#	AVISO:
-#	Estourou os argumentos desse procedimento, como no bin nao tem a informacao da largura/altura da imagem,
-#	temos que passa-la manualmente, mas tambem precisamos passar a largura/altura que sera desenhado no frame.
-#	Nao tem argumentos suficientes, tava pensando em:
-#		a3 = endereco da memoria com a largura e altura da imagem
-#		a4 = endereco da memoria com a largura e altura que sera desenhada
-#	Vai ficar um pouco mais lento por ter que ler da memoria, mas e melhor que alguma gambiarra pra passar mais de 8 argumentos.
-#
-#	No momento ta funcionando + ou - sem a largura e altura a ser desenhada, mas e importante implementar principalmente
-#	pra renderizar o mapa dinamico sem nenhum problema.
-#	Atualmente a ultima faixa de pixels do mapa ta meio zuada, talvez esse seja o problema.
-#
+APPROACH:	flt.s t0,fa1,fa0	# target < val
+		bnez t0,APPROACH.MAX 
 
-RENDER:		lhu t1,0(a3)
+		fadd.s fa0,fa0,fa2	# val + maxMove
+		j MIN.F			# min(val + maxMove, target)
 
-		# Calculo do offset na imagem
-		mul t0,a7,t1		# t0 = y na imagem * tamanho de cada linha
-		add t0,t0,a6		# offset imagem += x na imagem
-		
-		# Calculo frame
-		li t1,0xFF0		# t1 = 0xFF0
-		add a5,a5,t1		# frame = 0xFF0 + frame
-		slli a5,a5,16		# frame << 16
-		addi a5,a5,0x258	# soma 258 pra fazer o efeito de barra preta em cima
-		slli a5,a5,4		# frame << 4
-		
-		# Calculo do offset na tela
-		li t1,SCREEN_WIDTH
-		mul t1,t1,a2		# t1 = 320 * y
-		add t1,t1,a1		# t1 = (320 * y) + x
-		add a5,t1,a5		# a5 = a5 + (320 * y) + x
-		
-		lhu t2,2(a4)
-		# Calculo do endereço final na tela
-		li t1,SCREEN_WIDTH
-		mul t1,t1,t2		# t1 = 320 * h
-		add t1,t1,a5		# t1 = a5 + (320 * h) + w
-		
-		lhu a3,0(a3)
-		lhu a4,0(a4)
-		
-		# t0 = offset na imagem
-		# s5 = offset na tela
-		# t1 = endereço final da tela
-		
-RENDER.LOOP:	# salva a0 antes de fazer as syscalls
-		mv t5,a0
-		
-		# seek no arquivo da imagem
-		li a7,62
-		mv a1,t0		# t0 = offset na imagem
-		li a2,0
-		ecall
-		
-		# restaura a0 pra proxima syscall
-		mv a0,t5
-		
-		# read no arquivo da imagem
-		li a7,63
-		mv a1,a5		# a5 = offset na tela
-		mv a2,a4		# TODO: problema aq
-		ecall			# write line
-		
-		# restaura a0 pro proximo loop
-		mv a0,t5
-		
-		# incrementar offset da imagem
-		add t0,t0,a3		# offset da imagem += largura da imagem
-		
-		# incrementar offset da tela
-		addi a5,a5,SCREEN_WIDTH	# offset da tela += largura da tela
-		
-		# a5 = endereco atual da tela
-		# t1 = endereco final da tela
-		# while a5 < t1 continue loop	
-		bltu a5,t1,RENDER.LOOP
+APPROACH.MAX:	fsub.s fa0,fa0,fa2	# val - maxMove
+		j MAX.F			# max(val - maxMove, target)
 
+###################### PROCEDIMENTO SIGN ########################
+#	ARGUMENTOS:						#
+#		fa0 = val					#
+#	RETORNO:						#
+#		retorna em a0 o sinal do float			#
+#			-1 = negativo				#
+#			0 = zero				#
+#			1 = positivo				#
+#################################################################
+
+MATH.SIGN:	fcvt.s.w ft0,zero
+		flt.s t0,fa0,ft0
+		bnez t0,MATH.SIGN.NEG
+		
+		flt.s t0,ft0,fa0
+		bnez t0,MATH.SIGN.POS
+		
+		li a0, 0
+		ret
+
+MATH.SIGN.POS:	li a0, 1
+		ret
+
+MATH.SIGN.NEG:	li a0, -1
 		ret
