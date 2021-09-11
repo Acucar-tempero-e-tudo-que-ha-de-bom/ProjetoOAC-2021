@@ -10,10 +10,13 @@
 
 CHAR_POS:	.float 8, 112
 
-MOVEX:		.byte 0
-ONGROUND:	.byte 1
+MOVEX:		.byte 0		# left: -1, right: 1
+MOVEY:		.byte 0		# up: -1, down: 1
+JUMP:		.byte 0		# jump: 1, nothing: 0
 
-INPUT_IGNORE:	.byte 1
+ONGROUND:	.byte 1		# temporary, fs4 will assume this value
+
+INPUT_ZEROES:	.byte 0		# may be temporary
 
 .text		
 		# Open MAPA file
@@ -22,7 +25,6 @@ INPUT_IGNORE:	.byte 1
 		li a1,0
 		ecall
 		mv s0,a0
-		
 		
 		# Open CHAR file
 		la a0,FILE_CHAR
@@ -35,8 +37,12 @@ INPUT_IGNORE:	.byte 1
 		flw fs0,0(t0)		# fs0 = char x
 		flw fs1,4(t0)		# fs1 = char y
 
-		fcvt.s.w fs2,zero
-		fcvt.s.w fs3,zero
+		fcvt.s.w fs2,zero	# fs2 = x velocity
+		fcvt.s.w fs3,zero	# fs3 = y velocity
+		fcvt.s.w fs4,zero	# fs4 = jump grace timer
+		
+		li t0,MAX_FALL
+		fcvt.s.w fs5,t0		# fs5 = max fall
 
 		#
 		# Registradores que devem permanecer durante o loop
@@ -44,7 +50,7 @@ INPUT_IGNORE:	.byte 1
 		# s0 = MAPA file descriptor
 		# s1 = current frame
 		# s2 = CHAR file descriptor
-		# s7 = last frame time
+		# s11 = last frame time
 		#
 		# fa7 = delta time
 		#
@@ -58,7 +64,7 @@ GAME_LOOP:	#
 		# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
 		#
 		csrr t0,3073			# t0 = current time
-		sub t0,t0,s7			# t0 = current time - last frame time
+		sub t0,t0,s11			# t0 = current time - last frame time
 		li t1,16			# 16ms entre cada frame (1000ms/60fps)
 		bltu t0,t1,GAME_LOOP		# enquanto n tiver passado 16ms, repete
 
@@ -130,7 +136,7 @@ GAME_LOOP:	#
 		
 		# Salva quando esse frame terminou de renderizar
 		# Usado pra garantir um framerate fixo no jogo
-		csrr s7,3073
+		csrr s11,3073
 		
 		# Troca de frame
 		# Agora que esta tudo renderizado pode mostrar pro usuario
@@ -154,9 +160,8 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		#la t1,LAST_INPUT
+INPUT:		#la t1,INPUT_IGNORE
 		#lb t0,0(t1)
-		#li t2,60
 		#bnez,t0,INPUT_RET
 		
 		#li t0,2
@@ -169,6 +174,9 @@ INPUT:		#la t1,LAST_INPUT
  
 		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
 		
+		la t1,INPUT_ZEROES
+  		sb zero,0(t1)
+  		
 		li a7,1
   		li a0,1
   		ecall
@@ -182,33 +190,53 @@ INPUT:		#la t1,LAST_INPUT
   		beq t0,t1,INPUT_S
   		li t1,'d'
   		beq t0,t1,INPUT_D
+  		li t1,' '
+  		beq t0,t1,INPUT_JUMP
   		li t1,'p'
   		beq t0,t1,EXIT
   		
-INPUT_ZERO:	li a7,1
+INPUT_ZERO:	la t0,INPUT_ZEROES
+  		lb t1,0(t0)
+  		
+  		li t2,2
+  		blt t1,t2,INPUT_INCR
+  		
+  		li a7,1
   		li a0,0
   		ecall
   		
 		la t0,MOVEX
-		sb zero,0(t0)
+		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
+		ret
 
-INPUT_RET:	ret
+INPUT_INCR:	addi t1,t1,1
+		sb t1,0(t0)
+		ret
 
-INPUT_W:	j INPUT_RET
+INPUT_W:	la t0,MOVEY
+		li t1,-1
+		sb t1,0(t0)
+		ret
 
 INPUT_A:	la t0,MOVEX
 		li t1,-1
 		sb t1,0(t0)
-		
-		j INPUT_RET
+		ret
 
-INPUT_S:	j INPUT_RET
+INPUT_S:	la t0,MOVEY
+		li t1,1
+		sb t1,0(t0)
+		ret
 
 INPUT_D:	la t0,MOVEX
 		li t1,1
 		sb t1,0(t0)
+		ret
 
-		j INPUT_RET
+INPUT_JUMP:	la t0,JUMP
+		li t1,1
+		sb t1,0(t0)
+		ret
 
 .include "helpers/render.s"
 .include "helpers/physics.s"

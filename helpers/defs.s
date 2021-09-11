@@ -42,23 +42,16 @@
 .eqv MAP_MAX_X			320
 .eqv MAP_MAX_Y			180
 
-
-#
-# Aceleracao em pixeis/s da movimentacao horizontal
-# Velocidade maxima em pixeis/s da movimentacao horizontal
-#
-.eqv MOV_X_ACC_LEFT		-60
-.eqv MOV_X_ACC_RIGHT		60
-.eqv MOV_X_DESACC_LEFT		30
-.eqv MOV_X_DESACC_RIGHT		-30
-
-.eqv MOV_X_MAX_RIGHT		240
-.eqv MOV_X_MAX_LEFT		-240
-
-
 #
 # Physics
 #
 .eqv MAX_RUN			90
 .eqv RUN_ACCEL			1000
 .eqv RUN_REDUCE			400
+
+.eqv MAX_FALL			160
+.eqv GRAVITY			900
+.eqv FAST_MAX_FALL		240
+.eqv FAST_MAX_ACCEL		300
+
+.eqv HALF_GRAV_THRESHOLD	40
