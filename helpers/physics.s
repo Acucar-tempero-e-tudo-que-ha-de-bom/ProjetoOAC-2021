@@ -7,7 +7,9 @@
 #		fs2 = char x velocity				#
 #		fs3 = char y velocity				#
 #		fs4 = jump grace timer				#
-#		fs5 = maxfall					#
+#		fs5 = varJumpTimer				#
+#		fs6 = varJumpSpeed				#
+#		fs7 = maxfall					#
 #								#
 #		s0 = onGround					#
 #################################################################
@@ -104,7 +106,7 @@ PHYSICS.V:		# Vertical Movement
 			flt.s		t0, ft0, fs3
 			beq		t0, t1, PHYSICS.MAX_FALL	# if mf < speedY, goes to max fall
 			
-			fmv.s		fa0, fs5		# maxFall
+			fmv.s		fa0, fs7		# maxFall
 			fmv.s		fa1, ft1		# fmf
 			
 			li		t0, FAST_MAX_ACCEL
@@ -112,11 +114,11 @@ PHYSICS.V:		# Vertical Movement
 			fmul.s		fa2, fa2, fa7		# FastMaxAccel * Engine.DeltaTime
 
 			call		APPROACH		# Approach(maxFall, fmf, FastMaxAccel * Engine.DeltaTime)
-			fmv.s		fs5, fa0		# maxFall = Approach(maxFall, fmf, FastMaxAccel * Engine.DeltaTime)
+			fmv.s		fs7, fa0		# maxFall = Approach(maxFall, fmf, FastMaxAccel * Engine.DeltaTime)
 			
 			j		PHYSICS.GRAVITY
 
-PHYSICS.MAX_FALL:	fmv.s		fa0, fs5		# maxFall
+PHYSICS.MAX_FALL:	fmv.s		fa0, fs7		# maxFall
 			fmv.s		fa1, ft0		# mf
 			
 			li		t0, FAST_MAX_ACCEL
@@ -124,10 +126,10 @@ PHYSICS.MAX_FALL:	fmv.s		fa0, fs5		# maxFall
 			fmul.s		fa2, fa2, fa7		# FastMaxAccel * Engine.DeltaTime
 			
 			call		APPROACH		# Approach(maxFall, mf, FastMaxAccel * Engine.DeltaTime)
-			fmv.s		fs5, fa0		# maxFall = Approach(maxFall, mf, FastMaxAccel * Engine.DeltaTime)
+			fmv.s		fs7, fa0		# maxFall = Approach(maxFall, mf, FastMaxAccel * Engine.DeltaTime)
 
 PHYSICS.GRAVITY:	# Gravity
-			bnez		s0, PHYSICS.JUMP	# if onGround, goes to jump
+			bnez		s0, PHYSICS.VARJUMP	# if onGround, goes to jump
 			
 			fabs.s		ft0, fs3		# ft0 = Abs(Speed.Y)
 			li		t0, HALF_GRAV_THRESHOLD
@@ -150,7 +152,7 @@ PHYSICS.GRAVITY.MULT:	li		t0, 1
 			fcvt.s.w	ft0, t0			# ft0 = mult = 1
 
 PHYSICS.GRAVITY.CALC:	fmv.s		fa0, fs3		# Speed.Y
-			fmv.s		fa1, fs5		# max
+			fmv.s		fa1, fs7		# max
 			
 			li		t0, GRAVITY
 			fcvt.s.w	fa2, t0			# Gravity
@@ -161,41 +163,49 @@ PHYSICS.GRAVITY.CALC:	fmv.s		fa0, fs3		# Speed.Y
 			fmv.s		fs3, fa0		# SpeedY = Approach(Speed.Y, max, Gravity * mult * Engine.DeltaTime)
 
 PHYSICS.VARJUMP:	la		t0, JUMP
-			lb		t1, 0(t0)		# t0 = jump pressed
+			lb		t1, 0(t0)		# t1 = jump pressed		
 			
 			# Variable jumping
-                	# if (varJumpTimer > 0)
-                    	#	if (Input.Jump.Check)
-                        #		Speed.Y = Math.Min(Speed.Y, varJumpSpeed);
-                    	# 	else
-                        #		varJumpTimer = 0;
+                        fcvt.s.w	ft0, zero
+                        fle.s		t0, fs5, ft0		# t0 = varJumpTimer <= 0
+                        bnez		t0, PHYSICS.JUMP	# if (varJumpTime <= 0) ignores variable jumping
+                        
+                        beqz		t1, PHYSICS.VARJUMP.RST	# if (jump is not pressed) resets varJumpTimer
+			
+			fmv.s		fa0, fs3		# Speed.Y
+			fmv.s		fa1, fs6		# varJumpSpeed
+			call		MIN.F
+			fmv.s		fs3, fa0		# Speed.Y = Math.Min(Speed.Y, varJumpSpeed)
+			
+			j		PHYSICS.JUMP
+
+PHYSICS.VARJUMP.RST:	fcvt.s.w	fs5, zero		# resets varJumpTimer
 
 PHYSICS.JUMP:		# Jump
-			la		t0, JUMP
-			lb		t0, 0(t0)		# t0 = jump pressed
-			# call JUMP
-			#if (Input.Jump.Pressed)
-                    	#	if (jumpGraceTimer > 0)
-                        #		Jump();
                         beqz		t1, PHYSICS.MOVE	# if jump not pressed, JUMP to move
                         
                         fcvt.s.w	ft0, zero
                         fle.s		t0, fs4, ft0
                         bnez		t0, PHYSICS.MOVE	# if jumpGraceTimer <= 0, JUMP to move
                         
-                        # call JUMP
-                        
-                        # jumpGraceTimer = 0;
-            		# varJumpTimer = VarJumpTime;
-            		# AutoJump = false;
-            		# dashAttackTimer = 0;
-            		# wallSlideTimer = WallSlideTime;
-            		# wallBoostTimer = 0;
+                        la		t1, MOVEX
+			lb		t1, 0(t1)		# t1 = moveX
+			
+			fcvt.s.w	fs4, zero		# jumpGraceTimer = 0
+			
+			la		t0, VARJUMPTIME
+			flw		fs4, 0(t0)		# varJumpTimer = VarJumpTime
+			
+			li		t0, JUMP_H_BOOST
+			fcvt.s.w	ft0, t0			# ft0 = JumpHBoost
+			fcvt.s.w	ft1, t1			# ft1 = moveX
+			fmul.s		ft0, ft0, ft1		# ft0 = JumpHBoost * moveX
+			fadd.s		fs2, fs2, ft0		# Speed.Y += JumpHBoost * moveX
 
-            		# Speed.X += JumpHBoost * moveX;
-            		# Speed.Y = JumpSpeed;
-            		# Speed += LiftBoost;
-            		# varJumpSpeed = Speed.Y;
+            		li		t0, JUMP_SPEED
+            		fcvt.s.w	fs3, t0			# Speed.Y = JumpSpeed
+            		
+            		fmv.s		fs6, fs3		# varJumpSpeed = Speed.Y
 			
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime

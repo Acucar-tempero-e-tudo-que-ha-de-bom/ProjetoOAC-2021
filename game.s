@@ -40,9 +40,11 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		fcvt.s.w fs2,zero	# fs2 = x velocity
 		fcvt.s.w fs3,zero	# fs3 = y velocity
 		fcvt.s.w fs4,zero	# fs4 = jump grace timer
+		fcvt.s.w fs5,zero	# fs5 = varJumpTimer
+		fcvt.s.w fs6,zero	# fs6 = varJumpSpeed
 		
 		li t0,MAX_FALL
-		fcvt.s.w fs5,t0		# fs5 = max fall
+		fcvt.s.w fs7,t0		# fs7 = max fall
 
 		#
 		# Registradores que devem permanecer durante o loop
@@ -207,6 +209,10 @@ INPUT_ZERO:	la t0,INPUT_ZEROES
   		
 		la t0,MOVEX
 		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
+		
+		la t0,JUMP
+		sb zero,0(t0)
+		
 		ret
 
 INPUT_INCR:	addi t1,t1,1

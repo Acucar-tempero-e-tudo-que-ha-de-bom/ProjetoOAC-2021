@@ -57,7 +57,7 @@ RENDER.LOOP:	# salva a0 antes de fazer as syscalls
 		# read no arquivo da imagem
 		li a7,63
 		mv a1,a5		# a5 = offset na tela
-		mv a2,a4		# TODO: problema aq
+		mv a2,a4
 		ecall			# write line
 		
 		# restaura a0 pro proximo loop
