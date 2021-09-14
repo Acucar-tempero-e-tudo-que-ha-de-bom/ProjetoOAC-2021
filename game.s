@@ -1,6 +1,7 @@
 .include "helpers/defs.s"
 .include "helpers/files.s"
 .include "helpers/data.s"
+.include "data/map_hitbox.s"
 
 .data
 #
@@ -8,7 +9,7 @@
 # x, y
 #
 
-CHAR_POS:	.float 8, 112
+CHAR_POS:	.float 8, 111
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
@@ -30,6 +31,11 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		la a0,FILE_CHAR
 		ecall
 		mv s2,a0
+		
+		# Open DEBUG file
+		la a0,FILE_DEBUG
+		ecall
+		mv s9,a0
 
 		li s1,1
 		
@@ -136,6 +142,25 @@ GAME_LOOP:	#
 		li a7,0
 		call RENDER
 		
+		# Draw DEBUG
+		mv a0,s9
+		
+		li t0, 10
+		li t1, 8
+		rem a1, s10, t0
+		mul a1, a1, t1
+		sub a1,a1,s3
+
+		div a2, s10, t0
+		sub a2,a2,s4
+		
+		la a3,FILE_DEBUG_SIZE
+		la a4,FILE_DEBUG_SIZE
+		mv a5,s1
+		li a6,0
+		li a7,0
+		call RENDER
+		
 		# Salva quando esse frame terminou de renderizar
 		# Usado pra garantir um framerate fixo no jogo
 		csrr s11,3073
@@ -179,9 +204,9 @@ INPUT:		#la t1,INPUT_IGNORE
 		la t1,INPUT_ZEROES
   		sb zero,0(t1)
   		
-		li a7,1
-  		li a0,1
-  		ecall
+		#li a7,1
+  		#li a0,1
+  		#ecall
   		
   		# compara pra saber qual input foi
   		li t1,'w'
@@ -203,9 +228,9 @@ INPUT_ZERO:	la t0,INPUT_ZEROES
   		li t2,2
   		blt t1,t2,INPUT_INCR
   		
-  		li a7,1
-  		li a0,0
-  		ecall
+  		#li a7,1
+  		#li a0,0
+  		#ecall
   		
 		la t0,MOVEX
 		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)

@@ -22,32 +22,6 @@ MIN:		ble		a0, a1, MIN.RET	# IF a0 < a1 JUMP MIN.RET
 		mv		a0, a1		# returns a1
 MIN.RET:	ret
 
-###################### PROCEDIMENTO MAX.F #######################
-#	ARGUMENTOS:						#
-#		fa0 = numero					#
-#		fa1 = numero					#
-#	RETORNO:						#
-#		retorna em fa0 o maior valor entre fa0 e fa1	#
-#################################################################
-
-MAX.F:		flt.s		t0, fa1, fa0
-		bnez		t0, MAX.F.RET	# IF fa1 < fa0 JUMP MAX.F.RET
-		fmv.s		fa0, fa1		# returns fa1
-MAX.F.RET:	ret
-
-###################### PROCEDIMENTO MIN.F #######################
-#	ARGUMENTOS:						#
-#		fa0 = numero					#
-#		fa1 = numero					#
-#	RETORNO:						#
-#		retorna em fa0 o menor valor entre fa0 e fa1	#
-#################################################################
-
-MIN.F:		fle.s		t0, fa0, fa1
-		bnez		t0, MIN.F.RET	# IF fa0 <= fa1 JUMP MIN.F.RET
-		fmv.s		fa0, fa1		# returns fa1
-MIN.F.RET:	ret
-
 #################### PROCEDIMENTO APPROACH ######################
 #	ARGUMENTOS:						#
 #		fa0 = val					#
@@ -61,10 +35,12 @@ APPROACH:	flt.s		t0, fa1, fa0	# target < val
 		bnez		t0, APPROACH.MAX 
 
 		fadd.s		fa0, fa0, fa2	# val + maxMove
-		j		MIN.F		# min(val + maxMove, target)
+		fmin.s		fa0, fa0, fa1	# return Min(val + maxMove, target)
+		ret
 
 APPROACH.MAX:	fsub.s		fa0, fa0, fa2	# val - maxMove
-		j		MAX.F		# max(val - maxMove, target)
+		fmax.s		fa0, fa0, fa1	# return Max(val - maxMove, target)
+		ret	
 
 ###################### PROCEDIMENTO SIGN ########################
 #	ARGUMENTOS:						#

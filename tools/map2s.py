@@ -32,8 +32,9 @@ if len(sys.argv) == 2:
     newFilename = filename[:-4]
     ext = '.s'
     with open(newFilename + ext, 'w') as writer:
-        writer.write(f"{newFilename}:\t.byte")
+        writer.write(f"{newFilename}:\t.byte\n\t\t")
         
+        linhas = []
         for i in range(0, height, 8):
             linha = []
             for j in range(0, width, 8):
@@ -56,7 +57,8 @@ if len(sys.argv) == 2:
                     continue
                 else:
                     print(f"Cor desconhecida: {r} {g} {b}")
-            writer.write(f"\n{', '.join(linha)},")
+            linhas.append(', '.join(linha))
+        writer.write(',\n\t\t'.join(linhas))
         print('Done!')
         sys.exit(0)
 else:

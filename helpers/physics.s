@@ -19,12 +19,63 @@ PHYSICS:		addi		sp, sp, -8
 			sw		s0, 8(sp)		# salva s0
 			
 			# s0 = onGround
-			la		t0, ONGROUND
-			lb		s0, 0(t0)
-			# call COLLISION
-			# collision needed to define onGround
+			la		t0, MAP_HITBOX		# t0 = block address
+			li		t1, 8
+			fcvt.s.w	ft1, t1			# ft1 = 8
 			
-			# Reset jump grace
+			# Calculo do Y
+			li		t1, HITBOX_Y_FEET_OFFSET
+			fcvt.s.w	ft2, t1			# ft2 = y offset
+			fadd.s		ft0, fs1, ft2		# ft0 = y + y offset
+			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.s.wu	ft0, t1
+			
+			li		t1, HITBOX_MAP_WIDTH
+			fcvt.s.w	ft2, t1			# ft2 = hitbox map width
+			
+			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			add		t0, t0, t1		# t0 += t1
+			
+			mv		s10, t1
+
+			# Calculo do X
+			li		t1, HITBOX_X_FEET_OFFSET
+			fcvt.s.w	ft3, t1			# ft2 = x offset
+			
+			fadd.s		ft2, fs0, ft3		# ft0 = char x + offset
+			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
+			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			
+			add		t2, t0, t1		# t2 = t0 + t1
+			
+			add		s10, s10, t1
+			
+			#addi		t2, t2, -3
+			
+			lbu		t1, 0(t2)
+			li a7, 1
+			mv a0, t1
+			ecall
+			bnez		t1, PHYSICS.ONGROUND
+			
+			#fadd.s		ft2, fs0, ft3		# ft2 = char x + offset
+			#fadd.s		ft2, ft2, ft1		# ft2 = char x + offset + 8
+			#fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
+			#fcvt.w.s	t1, ft2			# t1 = floor(ft0)
+			#add		t2, t0, t1		# t0 += t1
+			
+			#lb		t1, 0(t2)
+			#bnez		t1, PHYSICS.ONGROUND
+			
+			li		s0, 0
+			j PHYSICS.BEGIN
+
+PHYSICS.ONGROUND:	li		s0, 1
+			fcvt.s.w	fs3, zero		# SpeedY = 0
+
+PHYSICS.BEGIN:		# Reset jump grace
                     	beqz		s0, PHYSICS.JGRACETIMER	# if not onGround, tries to decrement jumpGraceTimer
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
@@ -172,10 +223,7 @@ PHYSICS.VARJUMP:	la		t0, JUMP
                         
                         beqz		t1, PHYSICS.VARJUMP.RST	# if (jump is not pressed) resets varJumpTimer
 			
-			fmv.s		fa0, fs3		# Speed.Y
-			fmv.s		fa1, fs6		# varJumpSpeed
-			call		MIN.F
-			fmv.s		fs3, fa0		# Speed.Y = Math.Min(Speed.Y, varJumpSpeed)
+			fmin.s		fs3, fs3, fs6		# Speed.Y = Math.Min(Speed.Y, varJumpSpeed)
 			
 			j		PHYSICS.JUMP
 
@@ -214,6 +262,8 @@ PHYSICS.MOVE:		# MoveH
 			# MoveV
 			fmul.s		ft0, fs3, fa7		# y vel * deltaTime
 			fadd.s		fs1, fs1, ft0		# y += y vel * deltaTime
+			
+			# TODO: Handle collisions
 			
 			lw		s0, 8(sp)		# restaura s0
 			lw		ra, 4(sp)		# restaura ra
