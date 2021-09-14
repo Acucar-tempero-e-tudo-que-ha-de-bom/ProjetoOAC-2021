@@ -6,6 +6,7 @@
 
 # KDMMIO
 .eqv KDMMIO_CONTROL_ADDRESS	0xFF200000
+.eqv KDMMIO_KEYDOWN_ADDRESS	0xFF210000
 
 # Largura e altura da tela
 # Sim, a altura nao vai ser 240 pois Celeste se baseia em 16:9 (320:180)

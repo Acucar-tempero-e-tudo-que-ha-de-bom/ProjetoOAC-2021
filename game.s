@@ -149,10 +149,10 @@ GAME_LOOP:	#
 		li t1, 8
 		rem a1, s10, t0
 		mul a1, a1, t1
-		sub a1,a1,s3
+		sub a1, a1, s3
 
 		div a2, s10, t0
-		sub a2,a2,s4
+		sub a2, a2, s4
 		
 		la a3,FILE_DEBUG_SIZE
 		la a4,FILE_DEBUG_SIZE
@@ -194,7 +194,7 @@ INPUT:		#la t1,INPUT_IGNORE
 		#li t0,2
 		#sb t0,0(t1)
 		
-		li t1,KDMMIO_CONTROL_ADDRESS
+		li t1,KDMMIO_KEYDOWN_ADDRESS
 		lw t0,0(t1)		
 		andi t0,t0,1	
   	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
@@ -204,9 +204,9 @@ INPUT:		#la t1,INPUT_IGNORE
 		la t1,INPUT_ZEROES
   		sb zero,0(t1)
   		
-		#li a7,1
-  		#li a0,1
-  		#ecall
+		li a7,1
+  		li a0,1
+  		ecall
   		
   		# compara pra saber qual input foi
   		li t1,'w'
@@ -217,20 +217,22 @@ INPUT:		#la t1,INPUT_IGNORE
   		beq t0,t1,INPUT_S
   		li t1,'d'
   		beq t0,t1,INPUT_D
-  		li t1,' '
-  		beq t0,t1,INPUT_JUMP
+  		li t1,'e'
+  		beq t0,t1,INPUT_E
+  		li t1,'q'
+  		beq t0,t1,INPUT_Q
   		li t1,'p'
   		beq t0,t1,EXIT
   		
-INPUT_ZERO:	la t0,INPUT_ZEROES
-  		lb t1,0(t0)
+INPUT_ZERO:	#la t0,INPUT_ZEROES
+  		#lb t1,0(t0)
   		
-  		li t2,2
-  		blt t1,t2,INPUT_INCR
+  		#li t2,2
+  		#blt t1,t2,INPUT_INCR
   		
-  		#li a7,1
-  		#li a0,0
-  		#ecall
+  		li a7,1
+  		li a0,0
+  		ecall
   		
 		la t0,MOVEX
 		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
@@ -247,6 +249,11 @@ INPUT_INCR:	addi t1,t1,1
 INPUT_W:	la t0,MOVEY
 		li t1,-1
 		sb t1,0(t0)
+		
+		la t0,JUMP
+		li t1,1
+		sb t1,0(t0)
+		
 		ret
 
 INPUT_A:	la t0,MOVEX
@@ -264,10 +271,34 @@ INPUT_D:	la t0,MOVEX
 		sb t1,0(t0)
 		ret
 
-INPUT_JUMP:	la t0,JUMP
+INPUT_Q:	la t0,MOVEY
+		li t1,-1
+		sb t1,0(t0)
+		
+		la t0,MOVEX
+		li t1,-1
+		sb t1,0(t0)
+		
+		la t0,JUMP
 		li t1,1
 		sb t1,0(t0)
+		
 		ret
+
+INPUT_E:	la t0,MOVEY
+		li t1,-1
+		sb t1,0(t0)
+		
+		la t0,MOVEX
+		li t1,1
+		sb t1,0(t0)
+		
+		la t0,JUMP
+		li t1,1
+		sb t1,0(t0)
+		
+		ret
+
 
 .include "helpers/render.s"
 .include "helpers/physics.s"

@@ -18,7 +18,15 @@ PHYSICS:		addi		sp, sp, -8
 			sw		ra, 4(sp)		# salva ra
 			sw		s0, 8(sp)		# salva s0
 			
-			# s0 = onGround
+			# Decrements varJumpTimer
+			# if (varJumpTimer > 0)
+                    	# 	varJumpTimer -= Engine.DeltaTime;
+                    	fcvt.s.w	ft0, zero
+                    	fle.s		t0, fs5, ft0
+                    	bnez		t0, PHYSICS.ISONGROUND
+                    	fsub.s		fs5, fs5, fa7
+			
+PHYSICS.ISONGROUND:	# s0 = onGround
 			la		t0, MAP_HITBOX		# t0 = block address
 			li		t1, 8
 			fcvt.s.w	ft1, t1			# ft1 = 8
@@ -55,9 +63,9 @@ PHYSICS:		addi		sp, sp, -8
 			#addi		t2, t2, -3
 			
 			lbu		t1, 0(t2)
-			li a7, 1
-			mv a0, t1
-			ecall
+			#li a7, 1
+			#mv a0, t1
+			#ecall
 			bnez		t1, PHYSICS.ONGROUND
 			
 			#fadd.s		ft2, fs0, ft3		# ft2 = char x + offset
@@ -73,7 +81,7 @@ PHYSICS:		addi		sp, sp, -8
 			j PHYSICS.BEGIN
 
 PHYSICS.ONGROUND:	li		s0, 1
-			fcvt.s.w	fs3, zero		# SpeedY = 0
+			#fcvt.s.w	fs3, zero		# SpeedY = 0
 
 PHYSICS.BEGIN:		# Reset jump grace
                     	beqz		s0, PHYSICS.JGRACETIMER	# if not onGround, tries to decrement jumpGraceTimer
@@ -81,8 +89,8 @@ PHYSICS.BEGIN:		# Reset jump grace
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 
 PHYSICS.JGRACETIMER:	fcvt.s.w	ft0, zero
-			flt.s		t0, ft0, fs4
-			beqz		t0, PHYSICS.H		# if jumpGraceTimer <= 0, continue to horizontal movement
+			fle.s		t0, fs4, ft0
+			bnez		t0, PHYSICS.H		# if jumpGraceTimer <= 0, continue to horizontal movement
 			fsub.s		fs4, fs4, fa7		# else jumpGraceTimer -= Engine.DeltaTime
 			
 			# Horizontal Movement
@@ -230,11 +238,11 @@ PHYSICS.VARJUMP:	la		t0, JUMP
 PHYSICS.VARJUMP.RST:	fcvt.s.w	fs5, zero		# resets varJumpTimer
 
 PHYSICS.JUMP:		# Jump
-                        beqz		t1, PHYSICS.MOVE	# if jump not pressed, JUMP to move
+                        beqz		t1, PHYSICS.COLLISION	# if jump not pressed, JUMP to move
                         
                         fcvt.s.w	ft0, zero
                         fle.s		t0, fs4, ft0
-                        bnez		t0, PHYSICS.MOVE	# if jumpGraceTimer <= 0, JUMP to move
+                        bnez		t0, PHYSICS.COLLISION	# if jumpGraceTimer <= 0, JUMP to move
                         
                         la		t1, MOVEX
 			lb		t1, 0(t1)		# t1 = moveX
@@ -242,7 +250,7 @@ PHYSICS.JUMP:		# Jump
 			fcvt.s.w	fs4, zero		# jumpGraceTimer = 0
 			
 			la		t0, VARJUMPTIME
-			flw		fs4, 0(t0)		# varJumpTimer = VarJumpTime
+			flw		fs5, 0(t0)		# varJumpTimer = VarJumpTime
 			
 			li		t0, JUMP_H_BOOST
 			fcvt.s.w	ft0, t0			# ft0 = JumpHBoost
@@ -255,6 +263,45 @@ PHYSICS.JUMP:		# Jump
             		
             		fmv.s		fs6, fs3		# varJumpSpeed = Speed.Y
 			
+PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
+			li		t1, 8
+			fcvt.s.w	ft1, t1			# ft1 = 8
+			
+			# Calculo do Y
+			li		t1, HITBOX_Y_FEET_OFFSET
+			addi		t1, t1, -1
+			fcvt.s.w	ft2, t1			# ft2 = y offset
+			
+			fmul.s		ft3, fs3, fa7		# Speed.Y * DeltaTime
+			fadd.s		ft3, fs1, ft3		# Pos.Y + Speed.Y * DeltaTime
+			fadd.s		ft0, ft3, ft2		# ft0 = y + y offset
+			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.s.wu	ft0, t1
+			
+			li		t1, HITBOX_MAP_WIDTH
+			fcvt.s.w	ft2, t1			# ft2 = hitbox map width
+			
+			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			add		t0, t0, t1		# t0 += t1
+			
+			li		t1, HITBOX_X_FEET_OFFSET
+			fcvt.s.w	ft3, t1			# ft2 = x offset
+			
+			fadd.s		ft2, fs0, ft3		# ft0 = char x + offset
+			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
+			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			
+			add		t2, t0, t1		# t2 = t0 + t1
+			
+			#addi		t2, t2, -3
+			
+			lbu		t1, 0(t2)
+			beqz		t1, PHYSICS.MOVE
+			
+			fcvt.s.w	fs3, zero		# Speed.Y = 0
+
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
 			fadd.s		fs0, fs0, ft0		# x += x vel * deltaTime
