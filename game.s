@@ -145,13 +145,14 @@ GAME_LOOP:	#
 		# Draw DEBUG
 		mv a0,s9
 		
-		li t0, 10
+		li t0, 80
 		li t1, 8
 		rem a1, s10, t0
 		mul a1, a1, t1
 		sub a1, a1, s3
 
 		div a2, s10, t0
+		mul a2, a2, t1
 		sub a2, a2, s4
 		
 		la a3,FILE_DEBUG_SIZE
@@ -187,27 +188,13 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		#la t1,INPUT_IGNORE
-		#lb t0,0(t1)
-		#bnez,t0,INPUT_RET
-		
-		#li t0,2
-		#sb t0,0(t1)
-		
-		li t1,KDMMIO_KEYDOWN_ADDRESS
+INPUT:		li t1,KDMMIO_KEYDOWN_ADDRESS
 		lw t0,0(t1)		
 		andi t0,t0,1	
   	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
  
 		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
-		
-		la t1,INPUT_ZEROES
-  		sb zero,0(t1)
-  		
-		li a7,1
-  		li a0,1
-  		ecall
-  		
+
   		# compara pra saber qual input foi
   		li t1,'w'
   		beq t0,t1,INPUT_W
@@ -221,20 +208,11 @@ INPUT:		#la t1,INPUT_IGNORE
   		beq t0,t1,INPUT_E
   		li t1,'q'
   		beq t0,t1,INPUT_Q
+  		
   		li t1,'p'
   		beq t0,t1,EXIT
   		
-INPUT_ZERO:	#la t0,INPUT_ZEROES
-  		#lb t1,0(t0)
-  		
-  		#li t2,2
-  		#blt t1,t2,INPUT_INCR
-  		
-  		li a7,1
-  		li a0,0
-  		ecall
-  		
-		la t0,MOVEX
+INPUT_ZERO:	la t0,MOVEX
 		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
 		
 		la t0,JUMP
