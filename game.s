@@ -13,9 +13,10 @@ CHAR_POS:	.float 8, 111
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
-JUMP:		.byte 0		# jump: 1, nothing: 0
+JUMP:		.byte 0		# jump: 1, not jumping: 0  -- troquei "nothing" por "not jumping", ta certo?
 
-ONGROUND:	.byte 1		# temporary, fs4 will assume this value
+ONGROUND:	.byte 1		# temporary, fs4 will assume this value -- por que tem que usar isso ao invés de só 
+				# 					   colocar no fs4 direto?
 
 INPUT_ZEROES:	.byte 0		# may be temporary
 
@@ -23,21 +24,21 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		# Open MAPA file
 		li a7,1024
 		la a0,FILE_MAP
-		li a1,0
+		li a1,0			# read-only
 		ecall
-		mv s0,a0
+		mv s0,a0		# s0 = MAP descriptor
 		
 		# Open CHAR file
 		la a0,FILE_CHAR
 		ecall
-		mv s2,a0
+		mv s2,a0		# s2 = CHAR descriptor
 		
 		# Open DEBUG file
 		la a0,FILE_DEBUG
 		ecall
 		mv s9,a0
 
-		li s1,1
+		li s1,1			# current frame
 		
 		la t0,CHAR_POS
 		flw fs0,0(t0)		# fs0 = char x
@@ -68,15 +69,15 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		#
 
 GAME_LOOP:	#
-		# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
+		# O framerate atual do jogo eh 60 fps, mas com o passar do desenvolvimento, se o
 		# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
 		#
-		csrr t0,3073			# t0 = current time
-		sub t0,t0,s11			# t0 = current time - last frame time
-		li t1,16			# 16ms entre cada frame (1000ms/60fps)
-		bltu t0,t1,GAME_LOOP		# enquanto n tiver passado 16ms, repete
+		csrr t0, 3073			# t0 = current time
+		sub t0, t0, s11			# t0 = current time - last frame time
+		li t1, 16			# 16ms entre cada frame (1000ms/60fps)
+		bltu t0, t1, GAME_LOOP		# enquanto nao tiver passado 16ms, repete
 
-		li t1,1000
+		li t1, 1000
 		fcvt.s.w ft0, t1                # ft0 = 1000
 		fcvt.s.w fa7, t0                # fa7 = delta time (in ms)
 		fdiv.s fa7, fa7, ft0            # fa7 /= 1000 (delta time in seconds)
@@ -86,6 +87,7 @@ GAME_LOOP:	#
 	
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
+		# ^ discutir
 
 		# Calculo do x
 		fcvt.w.s a0,fs0			# a0 = char x
@@ -188,92 +190,100 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		li t1,KDMMIO_KEYDOWN_ADDRESS
-		lw t0,0(t1)		
-		andi t0,t0,1	
-  	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
+INPUT:		li t1, KDMMIO_KEYDOWN_ADDRESS
+		lw t0, 0(t1)
+		andi t0, t0, 1		# flag bit mask	
+  	 	beqz t0, INPUT_ZERO	# se nao tiver input, retorna
  
-		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
+		lw t0, 4(t1)		# caso contrario, pega o valor que ta no buffer
 
   		# compara pra saber qual input foi
-  		li t1,'w'
-  		beq t0,t1,INPUT_W
-  		li t1,'a'
-  		beq t0,t1,INPUT_A
-  		li t1,'s'
-  		beq t0,t1,INPUT_S
-  		li t1,'d'
-  		beq t0,t1,INPUT_D
-  		li t1,'e'
-  		beq t0,t1,INPUT_E
-  		li t1,'q'
-  		beq t0,t1,INPUT_Q
+  		li 	t1, 'w'
+  		beq 	t0, t1, INPUT_W
+  		li 	t1, 'a'
+  		beq 	t0, t1, INPUT_A
+  		li 	t1, 's'
+  		beq 	t0, t1, INPUT_S
+  		li 	t1, 'd'
+  		beq 	t0, t1, INPUT_D
+  		li 	t1, 'e'
+  		beq 	t0, t1, INPUT_E
+  		li 	t1, 'q'
+  		beq 	t0, t1, INPUT_Q
   		
   		li t1,'p'
   		beq t0,t1,EXIT
   		
-INPUT_ZERO:	la t0,MOVEX
-		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
+INPUT_ZERO:	# caso nao tenha input
+		la t0, MOVEX
+		sh zero, 0(t0)		# zera moveX e moveY (cada um eh um byte, por isso usamos halfword, pra zerar os dois)
 		
-		la t0,JUMP
-		sb zero,0(t0)
-		
-		ret
-
-INPUT_INCR:	addi t1,t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_W:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
+		la t0, JUMP
+		sb zero, 0(t0)		# zera o JUMP tambem
 		
 		ret
 
-INPUT_A:	la t0,MOVEX
-		li t1,-1
-		sb t1,0(t0)
+INPUT_INCR:	# onde que esse negocio eh chamado?
+		addi t1, t1, 1
+		sb t1, 0(t0)
 		ret
 
-INPUT_S:	la t0,MOVEY
-		li t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_D:	la t0,MOVEX
-		li t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_Q:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
+INPUT_W:	# Pula
+		la t0, MOVEY
+		li t1, -1
+		sb t1, 0(t0)		# moveY = -1
 		
-		la t0,MOVEX
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
+		la t0, JUMP
+		li t1, 1
+		sb t1, 0(t0)		# jump = 1
 		
 		ret
 
-INPUT_E:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
+INPUT_A:	# Esquerda
+		la t0, MOVEX
+		li t1, -1
+		sb t1, 0(t0)		# moveX = -1
+		ret
+
+INPUT_S:	# Abaixa
+		la t0, MOVEY
+		li t1, 1
+		sb t1, 0(t0)		# moveY = 1
+		ret
+
+INPUT_D:	# Direita
+		la t0, MOVEX
+		li t1, 1
+		sb t1, 0(t0)		# moveX = 1
+		ret
+
+INPUT_Q:	# Dash pra esquerda
+		la t0, MOVEY
+		li t1, -1
+		sb t1, 0(t0)		# moveY = -1
 		
-		la t0,MOVEX
-		li t1,1
-		sb t1,0(t0)
+		la t0, MOVEX
+		li t1, -1
+		sb t1, 0(t0)		# moveX = -1
 		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
+		la t0, JUMP
+		li t1, 1
+		sb t1, 0(t0)		# jump = 1
+		
+		ret
+
+INPUT_E:	# Dash pra direita
+		la t0, MOVEY
+		li t1, -1
+		sb t1,0(t0)		# moveY = -1
+		
+		la t0, MOVEX
+		li t1, 1
+		sb t1, 0(t0)		# moveX = 1
+		
+		la t0, JUMP
+		li t1, 1
+		sb t1, 0(t0)		# jump = 1
 		
 		ret
 

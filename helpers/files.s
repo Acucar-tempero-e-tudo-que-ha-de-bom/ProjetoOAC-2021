@@ -1,6 +1,6 @@
 .data
 
-SCREEN_SIZE:		.half 320,180
+SCREEN_SIZE:		.half 320,180	# 40x22.5 tiles 
 
 FILE_MAP:		.string "sprites/mapa.bin"
 FILE_MAP_SIZE:		.half 640,360

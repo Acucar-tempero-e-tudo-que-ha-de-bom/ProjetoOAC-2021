@@ -1,4 +1,6 @@
 ##################### PROCEDIMENTO PHYSICS ######################
+#	Faz tal coisa e coisa e tal				#
+#								#
 #	ARGUMENTOS:						#
 #		fa7 = delta time				#
 #	REGISTRADORES:						#
@@ -20,9 +22,9 @@ PHYSICS:		addi		sp, sp, -8
 			
 			# Decrements varJumpTimer
 			# if (varJumpTimer > 0)
-                    	# 	varJumpTimer -= Engine.DeltaTime;
+                    	# 	varJumpTimer -= Engine.DeltaTime; o que ta acontecendo aqui? o que eh varJumpTimer?
                     	fcvt.s.w	ft0, zero
-                    	fle.s		t0, fs5, ft0
+                    	fle.s		t0, fs5, ft0		# t0 = (0 <= varJumpTimer ? 1 : 0)
                     	bnez		t0, PHYSICS.ISONGROUND
                     	fsub.s		fs5, fs5, fa7
 			
@@ -32,19 +34,19 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fcvt.s.w	ft1, t1			# ft1 = 8
 			
 			# Calculo do Y
-			li		t1, HITBOX_Y_FEET_OFFSET
+			li		t1, HITBOX_Y_FEET_OFFSET	# pra que isso serve?
 			fcvt.s.w	ft2, t1			# ft2 = y offset
 			fadd.s		ft0, fs1, ft2		# ft0 = y + y offset
 			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1
+			fcvt.s.wu	ft0, t1			# o que eh o ft0?
 			
 			li		t1, HITBOX_MAP_WIDTH
 			fcvt.s.w	ft2, t1			# ft2 = hitbox map width
 			
 			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			add		t0, t0, t1		# t0 += t1
+			add		t0, t0, t1		# block address (t0) += t1
 			
 			mv		s10, t1
 
@@ -56,13 +58,13 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
 			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
-			add		t2, t0, t1		# t2 = t0 + t1
+			add		t2, t0, t1		# t2 = t0 + t1 que endereço eh t2?
 			
-			add		s10, s10, t1
+			add		s10, s10, t1		# o que ta fazendo com s10? ele nao ta sendo usado depois
 			
 			#addi		t2, t2, -3
 			
-			lbu		t1, 0(t2)
+			lbu		t1, 0(t2)		# carrega endereco do pe pra saber se ta no chao
 			#li a7, 1
 			#mv a0, t1
 			#ecall
