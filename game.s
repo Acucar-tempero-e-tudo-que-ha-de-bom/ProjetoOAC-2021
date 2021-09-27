@@ -1,21 +1,8 @@
-.include "helpers/defs.s"
-.include "helpers/files.s"
-.include "helpers/data.s"
-.include "data/map_hitbox.s"
+.include "components/helpers/defs.s"
 
 .data
-#
-# Posicao do personagem
-# x, y
-#
 
-CHAR_POS:	.float 8, 111
-
-MOVEX:		.byte 0		# left: -1, right: 1
-MOVEY:		.byte 0		# up: -1, down: 1
-JUMP:		.byte 0		# jump pressed: 1,  jump not pressed: 0
-
-INPUT_ZEROES:	.byte 0		# may be temporary
+.include "components/data_includes.s"
 
 .text		
 		# Open MAPA file
@@ -47,7 +34,7 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		fcvt.s.w fs5,zero	# fs5 = varJumpTimer
 		fcvt.s.w fs6,zero	# fs6 = varJumpSpeed
 		
-		li t0,MAX_FALL
+		li t0, MAX_FALL
 		fcvt.s.w fs7,t0		# fs7 = max fall
 
 		#
@@ -82,10 +69,12 @@ GAME_LOOP:	#
 		call PHYSICS
 		call INPUT
 	
-		# Calcular posicao do mapa de acordo com o personagem
-		# O personagem deve ficar sempre que possível no centro da tela
-		               # ou nao (topico discutido) #
-
+###### ACHO QUE DA PRA COLOCAR ESSA PARTE NUM ARQUIVO SEPARADO
+     #	   #
+     #	    #	# Calcular posicao do mapa de acordo com o personagem
+     #########	# O personagem deve ficar sempre que possível no centro da tela
+	    #	               # ou nao (topico discutido) #
+           #
 		# Calculo do x
 		fcvt.w.s a0,fs0			# a0 = char x
 
@@ -187,99 +176,4 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		li t1, KDMMIO_KEYDOWN_ADDRESS
-		lw t0, 0(t1)
-		andi t0, t0, 1		# flag bit mask	
-  	 	beqz t0, INPUT_ZERO	# se nao tiver input, retorna
- 
-		lw t0, 4(t1)		# caso contrario, pega o valor que ta no buffer
-
-  		# compara pra saber qual input foi
-  		li 	t1, 'w'
-  		beq 	t0, t1, INPUT_W
-  		li 	t1, 'a'
-  		beq 	t0, t1, INPUT_A
-  		li 	t1, 's'
-  		beq 	t0, t1, INPUT_S
-  		li 	t1, 'd'
-  		beq 	t0, t1, INPUT_D
-  		li 	t1, 'e'
-  		beq 	t0, t1, INPUT_E
-  		li 	t1, 'q'
-  		beq 	t0, t1, INPUT_Q
-  		
-  		li t1,'p'
-  		beq t0,t1,EXIT
-  		
-INPUT_ZERO:	# caso nao tenha input
-		la t0, MOVEX
-		sh zero, 0(t0)		# zera moveX e moveY (cada um eh um byte, por isso usamos halfword, pra zerar os dois)
-		
-		la t0, JUMP
-		sb zero, 0(t0)		# zera o JUMP tambem
-		
-		ret
-
-INPUT_W:	# Pula
-		la t0, MOVEY
-		li t1, -1
-		sb t1, 0(t0)		# moveY = -1
-		
-		la t0, JUMP
-		li t1, 1
-		sb t1, 0(t0)		# jump = 1
-		
-		ret
-
-INPUT_A:	# Esquerda
-		la t0, MOVEX
-		li t1, -1
-		sb t1, 0(t0)		# moveX = -1
-		ret
-
-INPUT_S:	# Abaixa
-		la t0, MOVEY
-		li t1, 1
-		sb t1, 0(t0)		# moveY = 1
-		ret
-
-INPUT_D:	# Direita
-		la t0, MOVEX
-		li t1, 1
-		sb t1, 0(t0)		# moveX = 1
-		ret
-
-INPUT_Q:	# Dash pra esquerda
-		la t0, MOVEY
-		li t1, -1
-		sb t1, 0(t0)		# moveY = -1
-		
-		la t0, MOVEX
-		li t1, -1
-		sb t1, 0(t0)		# moveX = -1
-		
-		la t0, JUMP
-		li t1, 1
-		sb t1, 0(t0)		# jump = 1
-		
-		ret
-
-INPUT_E:	# Dash pra direita
-		la t0, MOVEY
-		li t1, -1
-		sb t1,0(t0)		# moveY = -1
-		
-		la t0, MOVEX
-		li t1, 1
-		sb t1, 0(t0)		# moveX = 1
-		
-		la t0, JUMP
-		li t1, 1
-		sb t1, 0(t0)		# jump = 1
-		
-		ret
-
-
-.include "helpers/render.s"
-.include "helpers/physics.s"
-.include "helpers/procs.s"
+.include "components/text_includes.s"
