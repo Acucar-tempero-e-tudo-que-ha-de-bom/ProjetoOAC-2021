@@ -1,4 +1,5 @@
 ###################### PROCEDIMENTO RENDER ######################
+#	[Explicar exatamente o que faz]				#
 #	ARGUMENTOS:						#
 #		a0 = file descriptor				#
 #		a1 = x na tela					#

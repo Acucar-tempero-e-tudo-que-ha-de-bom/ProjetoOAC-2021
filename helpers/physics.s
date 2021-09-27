@@ -1,5 +1,5 @@
 ##################### PROCEDIMENTO PHYSICS ######################
-#	Faz tal coisa e coisa e tal				#
+#      [[[[Tem que explicar o que o procedimento faz]]]]	#
 #								#
 #	ARGUMENTOS:						#
 #		fa7 = delta time				#
@@ -22,7 +22,7 @@ PHYSICS:		addi		sp, sp, -8
 			
 			# Decrements varJumpTimer
 			# if (varJumpTimer > 0)
-                    	# 	varJumpTimer -= Engine.DeltaTime; o que ta acontecendo aqui? o que eh varJumpTimer?
+                    	# 	varJumpTimer -= Engine.DeltaTime;
                     	fcvt.s.w	ft0, zero
                     	fle.s		t0, fs5, ft0		# t0 = (0 <= varJumpTimer ? 1 : 0)
                     	bnez		t0, PHYSICS.ISONGROUND
@@ -34,12 +34,12 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fcvt.s.w	ft1, t1			# ft1 = 8
 			
 			# Calculo do Y
-			li		t1, HITBOX_Y_FEET_OFFSET	# pra que isso serve?
+			li		t1, HITBOX_Y_FEET_OFFSET
 			fcvt.s.w	ft2, t1			# ft2 = y offset
 			fadd.s		ft0, fs1, ft2		# ft0 = y + y offset
 			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1			# o que eh o ft0?
+			fcvt.s.wu	ft0, t1			# coordenada em pixel
 			
 			li		t1, HITBOX_MAP_WIDTH
 			fcvt.s.w	ft2, t1			# ft2 = hitbox map width
@@ -58,9 +58,9 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
 			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
-			add		t2, t0, t1		# t2 = t0 + t1 que endereço eh t2?
+			add		t2, t0, t1
 			
-			add		s10, s10, t1		# o que ta fazendo com s10? ele nao ta sendo usado depois
+			add		s10, s10, t1
 			
 			#addi		t2, t2, -3
 			

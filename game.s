@@ -13,10 +13,7 @@ CHAR_POS:	.float 8, 111
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
-JUMP:		.byte 0		# jump: 1, not jumping: 0  -- troquei "nothing" por "not jumping", ta certo?
-
-ONGROUND:	.byte 1		# temporary, fs4 will assume this value -- por que tem que usar isso ao invés de só 
-				# 					   colocar no fs4 direto?
+JUMP:		.byte 0		# jump pressed: 1,  jump not pressed: 0
 
 INPUT_ZEROES:	.byte 0		# may be temporary
 
@@ -24,7 +21,7 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		# Open MAPA file
 		li a7,1024
 		la a0,FILE_MAP
-		li a1,0			# read-only
+		li a1,0			# read-only flag
 		ecall
 		mv s0,a0		# s0 = MAP descriptor
 		
@@ -87,7 +84,7 @@ GAME_LOOP:	#
 	
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
-		# ^ discutir
+		               # ou nao (topico discutido) #
 
 		# Calculo do x
 		fcvt.w.s a0,fs0			# a0 = char x
@@ -221,11 +218,6 @@ INPUT_ZERO:	# caso nao tenha input
 		la t0, JUMP
 		sb zero, 0(t0)		# zera o JUMP tambem
 		
-		ret
-
-INPUT_INCR:	# onde que esse negocio eh chamado?
-		addi t1, t1, 1
-		sb t1, 0(t0)
 		ret
 
 INPUT_W:	# Pula
