@@ -95,9 +95,16 @@ PHYSICS.BEGIN:		# Goes to dashing
 
 PHYSICS.JGRACETIMER:	fcvt.s.w	ft0, zero
 			fle.s		t0, fs4, ft0
-			bnez		t0, PHYSICS.CAN.DASH	# if jumpGraceTimer <= 0, continue
+			bnez		t0, PHYSICS.DASHTIMER	# if jumpGraceTimer <= 0, continue
 			fsub.s		fs4, fs4, fa7		# else jumpGraceTimer -= Engine.DeltaTime
 
+PHYSICS.DASHTIMER:	# Reset dashes
+			beqz		s0, PHYSICS.CAN.DASH	# if not onGround, continue
+			
+			la		t0, DASHES
+			li		t1, 1
+			sb		t1, 0(t0)		# dashes = 1
+			
 PHYSICS.CAN.DASH:	la		t0, DASH
 			lb		t0, 0(t0)	# t0 = dash pressed
 			
@@ -328,6 +335,8 @@ PHYSICS.DASH:		fsub.s		fs8, fs8 fa7		# dash timer -= DeltaTime
 			
 PHYSICS.END.DASH:	la		t0, DASHING
 			sb		zero, 0(t0)
+			
+			fcvt.s.w	fs8, zero		# zeroes dash timer
 			
 PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
 			li		t1, 8
