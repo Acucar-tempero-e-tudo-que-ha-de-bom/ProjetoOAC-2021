@@ -15,7 +15,12 @@ MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
 JUMP:		.byte 0		# jump: 1, nothing: 0
 
-ONGROUND:	.byte 1		# temporary, fs4 will assume this value
+DASH:		.byte 0		# dash: 1, nothing: 0
+DASHX:		.byte 0		# left: -1, right: 1
+DASHY:		.byte 0		# up: -1, down: 1
+
+DASHES:		.byte 1
+DASHING:	.byte 0		# is the char dashing?
 
 INPUT_ZEROES:	.byte 0		# may be temporary
 
@@ -48,6 +53,8 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		fcvt.s.w fs4,zero	# fs4 = jump grace timer
 		fcvt.s.w fs5,zero	# fs5 = varJumpTimer
 		fcvt.s.w fs6,zero	# fs6 = varJumpSpeed
+		fcvt.s.w fs7,zero	# fs7 = maxfall
+		fcvt.s.w fs8,zero	# fs8 = dash timer
 		
 		li t0,MAX_FALL
 		fcvt.s.w fs7,t0		# fs7 = max fall
@@ -188,96 +195,8 @@ EXIT:		# Closes MAPA file
 		li a7,10
 		ecall
 
-INPUT:		li t1,KDMMIO_KEYDOWN_ADDRESS
-		lw t0,0(t1)		
-		andi t0,t0,1	
-  	 	beqz t0,INPUT_ZERO	# se nao tiver input, retorna
- 
-		lw t0,4(t1)		# caso contrario, pega o valor que ta no buffer
-
-  		# compara pra saber qual input foi
-  		li t1,'w'
-  		beq t0,t1,INPUT_W
-  		li t1,'a'
-  		beq t0,t1,INPUT_A
-  		li t1,'s'
-  		beq t0,t1,INPUT_S
-  		li t1,'d'
-  		beq t0,t1,INPUT_D
-  		li t1,'e'
-  		beq t0,t1,INPUT_E
-  		li t1,'q'
-  		beq t0,t1,INPUT_Q
-  		
-  		li t1,'p'
-  		beq t0,t1,EXIT
-  		
-INPUT_ZERO:	la t0,MOVEX
-		sh zero,0(t0)		# zera moveX e moveY (cada um e um byte, por isso usamos halfword, pra zerar os dois)
-		
-		la t0,JUMP
-		sb zero,0(t0)
-		
-		ret
-
-INPUT_INCR:	addi t1,t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_W:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
-		
-		ret
-
-INPUT_A:	la t0,MOVEX
-		li t1,-1
-		sb t1,0(t0)
-		ret
-
-INPUT_S:	la t0,MOVEY
-		li t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_D:	la t0,MOVEX
-		li t1,1
-		sb t1,0(t0)
-		ret
-
-INPUT_Q:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,MOVEX
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
-		
-		ret
-
-INPUT_E:	la t0,MOVEY
-		li t1,-1
-		sb t1,0(t0)
-		
-		la t0,MOVEX
-		li t1,1
-		sb t1,0(t0)
-		
-		la t0,JUMP
-		li t1,1
-		sb t1,0(t0)
-		
-		ret
-
-
+.include "helpers/input.s"
 .include "helpers/render.s"
 .include "helpers/physics.s"
 .include "helpers/procs.s"
+

@@ -10,6 +10,7 @@
 #		fs5 = varJumpTimer				#
 #		fs6 = varJumpSpeed				#
 #		fs7 = maxfall					#
+#		fs8 = dash timer				#
 #								#
 #		s0 = onGround					#
 #################################################################
@@ -81,17 +82,71 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			j PHYSICS.BEGIN
 
 PHYSICS.ONGROUND:	li		s0, 1
-			#fcvt.s.w	fs3, zero		# SpeedY = 0
 
-PHYSICS.BEGIN:		# Reset jump grace
+PHYSICS.BEGIN:		# Goes to dashing
+			la		t0, DASHING
+			lb		t0, 0(t0)			
+			bnez		t0, PHYSICS.DASH
+			
+			# Reset jump grace
                     	beqz		s0, PHYSICS.JGRACETIMER	# if not onGround, tries to decrement jumpGraceTimer
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 
 PHYSICS.JGRACETIMER:	fcvt.s.w	ft0, zero
 			fle.s		t0, fs4, ft0
-			bnez		t0, PHYSICS.H		# if jumpGraceTimer <= 0, continue to horizontal movement
+			bnez		t0, PHYSICS.CAN.DASH	# if jumpGraceTimer <= 0, continue
 			fsub.s		fs4, fs4, fa7		# else jumpGraceTimer -= Engine.DeltaTime
+
+PHYSICS.CAN.DASH:	la		t0, DASH
+			lb		t0, 0(t0)	# t0 = dash pressed
+			
+			fcvt.s.w	ft0, zero
+			fle.s		t1, ft0, fs8	# t1 = dash timer <= 0
+			
+			la		t2, DASHES
+			lb		t2, 0(t2)
+			slt		t2, zero, t2	# t2 = dashes > 0
+			
+			and		t0, t0, t1	# t0 = dash pressed && dash timer <= 0
+			and		t0, t0, t2	# t0 = dash pressed && dash timer <= 0 && dashes > 0
+			beqz		t0, PHYSICS.H
+			
+PHYSICS.START.DASH:	la		t0, DASHES
+			lb		t1, 0(t0)	# t1 = dashes
+			
+			addi		a0, t1, -1
+			mv		a1, zero
+			call		MAX
+			
+			#la		t0, DASHES
+			sb		a0, 0(t0)	# save new dashes value as Math.Max(0, dashes - 1)
+			
+			la		t0, DASHING
+			li		t1, 1
+			sb		t1, 0(t0)	# dashing = 1
+			
+			# Dash timer
+			la		t0, DASHTIME
+			flw		fs8, 0(t0)	# load inital dash time in dash timer
+			
+			li		t0, DASH_SPEED
+			fcvt.s.w	ft0, t0		# ft0 = dash speed
+			# Dash X speed
+			la		t1, DASHX
+			lb		t1, 0(t1)
+			fcvt.s.w	ft1, t1		# ft1 = dash x direction
+			
+			fmul.s		fs2, ft1, ft0	# Speed.X = dash x speed
+			
+			# Dash Y speed
+			la		t1, DASHY
+			lb		t1, 0(t1)
+			fcvt.s.w	ft1, t1		# ft1 = dash y direction
+			
+			fmul.s		fs3, ft1, ft0	# Speed.X = dash y speed
+			
+			j 		PHYSICS.COLLISION
 			
 			# Horizontal Movement
 PHYSICS.H:		beqz		s0, PHYSICS.H.AIR
@@ -262,6 +317,17 @@ PHYSICS.JUMP:		# Jump
             		fcvt.s.w	fs3, t0			# Speed.Y = JumpSpeed
             		
             		fmv.s		fs6, fs3		# varJumpSpeed = Speed.Y
+            		
+            		j PHYSICS.COLLISION
+
+PHYSICS.DASH:		fsub.s		fs8, fs8 fa7		# dash timer -= DeltaTime
+			fcvt.s.w	ft0, zero
+			fle.s		t0, fs8, ft0		# if dash timer <= 0
+			
+			beqz		t0, PHYSICS.COLLISION
+			
+PHYSICS.END.DASH:	la		t0, DASHING
+			sb		zero, 0(t0)
 			
 PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
 			li		t1, 8
@@ -295,8 +361,6 @@ PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
 			
 			add		t2, t0, t1		# t2 = t0 + t1
 			
-			#addi		t2, t2, -3
-			
 			lbu		t1, 0(t2)
 			beqz		t1, PHYSICS.MOVE
 			
@@ -316,4 +380,4 @@ PHYSICS.MOVE:		# MoveH
 			lw		ra, 4(sp)		# restaura ra
 			addi		sp, sp, 8
 			
-			ret
+PHYSICS.END:		ret
