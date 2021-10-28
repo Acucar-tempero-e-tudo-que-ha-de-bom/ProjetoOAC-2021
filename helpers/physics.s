@@ -53,30 +53,25 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			li		t1, HITBOX_X_FEET_OFFSET
 			fcvt.s.w	ft3, t1			# ft2 = x offset
 			
-			fadd.s		ft2, fs0, ft3		# ft0 = char x + offset
-			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
+			fadd.s		ft3, fs0, ft3		# ft0 = char x + offset
+			fdiv.s		ft2, ft3, ft1		# ft0 = x / 8
 			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
 			add		t2, t0, t1		# t2 = t0 + t1
 			
 			add		s10, s10, t1
-			
-			#addi		t2, t2, -3
-			
+						
 			lbu		t1, 0(t2)
-			#li a7, 1
-			#mv a0, t1
-			#ecall
 			bnez		t1, PHYSICS.ONGROUND
 			
-			#fadd.s		ft2, fs0, ft3		# ft2 = char x + offset
-			#fadd.s		ft2, ft2, ft1		# ft2 = char x + offset + 8
-			#fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
-			#fcvt.w.s	t1, ft2			# t1 = floor(ft0)
-			#add		t2, t0, t1		# t0 += t1
+			fadd.s		ft2, ft3, ft1		# ft2 = char x + offset + 8
+			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
+			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
-			#lb		t1, 0(t2)
-			#bnez		t1, PHYSICS.ONGROUND
+			add		t2, t0, t1		# t0 += t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.ONGROUND
 			
 			li		s0, 0
 			j PHYSICS.BEGIN
@@ -125,8 +120,7 @@ PHYSICS.START.DASH:	la		t0, DASHES
 			addi		a0, t1, -1
 			mv		a1, zero
 			call		MAX
-			
-			#la		t0, DASHES
+
 			sb		a0, 0(t0)	# save new dashes value as Math.Max(0, dashes - 1)
 			
 			la		t0, DASHING
@@ -364,16 +358,27 @@ PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
 			li		t1, HITBOX_X_FEET_OFFSET
 			fcvt.s.w	ft3, t1			# ft2 = x offset
 			
-			fadd.s		ft2, fs0, ft3		# ft0 = char x + offset
-			fdiv.s		ft2, ft2, ft1		# ft0 = x / 8
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fadd.s		ft3, fs0, ft3		# ft3 = char x + offset
+			fdiv.s		ft2, ft3, ft1		# ft2 = x / 8
+			fcvt.wu.s	t1, ft2			# t1 = floor(ft2)
 			
 			add		t2, t0, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			beqz		t1, PHYSICS.MOVE
+			bnez		t1, PHYSICS.ZEROX
 			
-			fcvt.s.w	fs3, zero		# Speed.Y = 0
+			fadd.s		ft2, ft3, ft1		# ft2 = (char x + offset) + 8
+			fdiv.s		ft2, ft2, ft1		# ft2 = x / 8
+			fcvt.wu.s	t1, ft2			# t1 = floor(ft2)
+			
+			add		t2, t0, t1		# t2 = t0 + t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.ZEROX
+			
+			j		PHYSICS.MOVE
+
+PHYSICS.ZEROX:		fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
