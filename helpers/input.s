@@ -1,53 +1,53 @@
 INPUT:		li		t1, KDMMIO_KEYDOWN_ADDRESS
 		lw		t0, 0(t1)
 		andi		t0, t0, 1
-  	 	beqz		t0, INPUT_ZERO	# se nao tiver input, zera as entradas
+  	 	beqz		t0, INPUT.ZERO	# se nao tiver input, zera as entradas
  
 		lw		t0, 4(t1)	# se houver input, pega o valor que ta no buffer pra comparacao
 
   		# Movimentos normais (lowercase)
   		li		t1, 'w'
-  		beq		t0, t1, INPUT_W
+  		beq		t0, t1, INPUT.W
   		li		t1, 'a'
-  		beq		t0, t1,INPUT_A
+  		beq		t0, t1, INPUT.A
   		li		t1, 's'
-  		beq		t0, t1, INPUT_S
+  		beq		t0, t1, INPUT.S
   		li		t1, 'd'
-  		beq		t0, t1, INPUT_D
+  		beq		t0, t1, INPUT.D
   		li		t1, 'e'
-  		beq		t0, t1, INPUT_E
+  		beq		t0, t1, INPUT.E
   		li		t1, 'q'
-  		beq		t0, t1, INPUT_Q
+  		beq		t0, t1, INPUT.Q
   		
   		# Dash (uppercase)
   		li		t1, 'W'
-  		beq		t0, t1, INPUT_DASH_W
+  		beq		t0, t1, INPUT.DASH.W
   		li		t1, 'A'
-  		beq		t0, t1, INPUT_DASH_A
+  		beq		t0, t1, INPUT.DASH.A
   		li		t1, 'S'
-  		beq		t0, t1, INPUT_DASH_S
+  		beq		t0, t1, INPUT.DASH.S
   		li		t1, 'D'
-  		beq		t0, t1, INPUT_DASH_D
+  		beq		t0, t1, INPUT.DASH.D
   		li		t1, 'Q'
-  		beq		t0, t1, INPUT_DASH_Q
+  		beq		t0, t1, INPUT.DASH.Q
   		li		t1, 'E'
-  		beq		t0, t1, INPUT_DASH_E
+  		beq		t0, t1, INPUT.DASH.E
   		li		t1, 'C'
-  		beq		t0, t1, INPUT_DASH_C
+  		beq		t0, t1, INPUT.DASH.C
   		li		t1, 'Z'
-  		beq		t0, t1, INPUT_DASH_Z
+  		beq		t0, t1, INPUT.DASH.Z
   		
   		# Teclas especiais
   		# (talvez podemos fazer um pause depois?)
   		li		t1, 'p'
   		beq		t0, t1, EXIT
   		
-INPUT_ZERO:	la		t0, MOVEX
+INPUT.ZERO:	la		t0, MOVEX
 		sw		zero, 0(t0)		# zera moveX, moveY, jump e dash (cada um eh um byte, por isso usamos word, pra zerar os quatro)
 		sh		zero, 4(t0)		# zera dashX e dashY (cada um eh um byte, por isso usamos half)
 		ret
 
-INPUT_W:	la		t0, MOVEY
+INPUT.W:	la		t0, MOVEY
 		li		t1, -1
 		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
@@ -57,7 +57,7 @@ INPUT_W:	la		t0, MOVEY
 		
 		ret
 
-INPUT_A:	la		t0, MOVEX
+INPUT.A:	la		t0, MOVEX
 		li		t1, -1
 		sb		t1, 0(t0)		# moveX = -1 (esquerda)
 		
@@ -67,12 +67,12 @@ INPUT_A:	la		t0, MOVEX
 		
 		ret
 
-INPUT_S:	la		t0, MOVEY
+INPUT.S:	la		t0, MOVEY
 		li		t1, 1
 		sb		t1, 0(t0)		# moveY = 1 (baixo)
 		ret
 
-INPUT_D:	la		t0, MOVEX
+INPUT.D:	la		t0, MOVEX
 		li		t1, 1
 		sb		t1, 0(t0)		# moveX = 1 (direita)
 		
@@ -81,7 +81,7 @@ INPUT_D:	la		t0, MOVEX
 		
 		ret
 
-INPUT_Q:	la		t0, MOVEY
+INPUT.Q:	la		t0, MOVEY
 		li		t1, -1
 		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
@@ -99,7 +99,7 @@ INPUT_Q:	la		t0, MOVEY
 		
 		ret
 
-INPUT_E:	la		t0, MOVEY
+INPUT.E:	la		t0, MOVEY
 		li		t1, -1
 		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
@@ -116,7 +116,7 @@ INPUT_E:	la		t0, MOVEY
 		
 		ret
 
-INPUT_DASH_W:	la		t0, DASHX
+INPUT.DASH.W:	la		t0, DASHX
 		li		t1, 0
 		sb		t1, 0(t0)		# dashX = 0 (nem pra esquerda, nem pra direita)
 		
@@ -130,7 +130,7 @@ INPUT_DASH_W:	la		t0, DASHX
 		
 		ret
 
-INPUT_DASH_A:	la		t0, DASHX
+INPUT.DASH.A:	la		t0, DASHX
 		li		t1, -1
 		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
@@ -148,7 +148,7 @@ INPUT_DASH_A:	la		t0, DASHX
 		
 		ret
 		
-INPUT_DASH_S:	la		t0, DASHX
+INPUT.DASH.S:	la		t0, DASHX
 		li		t1, 0
 		sb		t1, 0(t0)		# dashX = 0 (nem pra esquerda, nem pra direita)
 		
@@ -162,7 +162,7 @@ INPUT_DASH_S:	la		t0, DASHX
 		
 		ret
 		
-INPUT_DASH_D:	la		t0, DASHX
+INPUT.DASH.D:	la		t0, DASHX
 		li		t1, 1
 		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
@@ -179,7 +179,7 @@ INPUT_DASH_D:	la		t0, DASHX
 		
 		ret
 
-INPUT_DASH_Q:	la		t0, DASHX
+INPUT.DASH.Q:	la		t0, DASHX
 		li		t1, -1
 		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
@@ -197,7 +197,7 @@ INPUT_DASH_Q:	la		t0, DASHX
 		
 		ret
 
-INPUT_DASH_E:	la		t0, DASHX
+INPUT.DASH.E:	la		t0, DASHX
 		li		t1, 1
 		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
@@ -214,7 +214,7 @@ INPUT_DASH_E:	la		t0, DASHX
 		
 		ret
 
-INPUT_DASH_C:	la		t0, DASHX
+INPUT.DASH.C:	la		t0, DASHX
 		li		t1, 1
 		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
@@ -231,7 +231,7 @@ INPUT_DASH_C:	la		t0, DASHX
 		
 		ret
 
-INPUT_DASH_Z:	la		t0, DASHX
+INPUT.DASH.Z:	la		t0, DASHX
 		li		t1, -1
 		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
