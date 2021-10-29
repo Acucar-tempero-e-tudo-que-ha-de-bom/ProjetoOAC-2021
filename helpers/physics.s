@@ -74,7 +74,7 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			bnez		t1, PHYSICS.ONGROUND
 			
 			li		s0, 0
-			j PHYSICS.BEGIN
+			j		PHYSICS.BEGIN
 
 PHYSICS.ONGROUND:	li		s0, 1
 
@@ -319,7 +319,7 @@ PHYSICS.JUMP:		# Jump
             		
             		fmv.s		fs6, fs3		# varJumpSpeed = Speed.Y
             		
-            		j PHYSICS.COLLISION
+            		j		PHYSICS.COLLISION
 
 PHYSICS.DASH:		fsub.s		fs8, fs8 fa7		# dash timer -= DeltaTime
 			fcvt.s.w	ft0, zero
@@ -332,53 +332,138 @@ PHYSICS.END.DASH:	la		t0, DASHING
 			
 			fcvt.s.w	fs8, zero		# zeroes dash timer
 			
-PHYSICS.COLLISION:	la		t0, MAP_HITBOX		# t0 = block address
-			li		t1, 8
-			fcvt.s.w	ft1, t1			# ft1 = 8
-			
-			# Calculo do Y
-			li		t1, HITBOX_Y_FEET_OFFSET
-			addi		t1, t1, -1
-			fcvt.s.w	ft2, t1			# ft2 = y offset
+PHYSICS.COLLISION:	la		t6, MAP_HITBOX		# t0 = block address
+
+			fmul.s		ft2, fs2, fa7		# Speed.X * DeltaTime
+			fadd.s		ft2, fs0, ft2		# Pos.X + Speed.X * DeltaTime
 			
 			fmul.s		ft3, fs3, fa7		# Speed.Y * DeltaTime
 			fadd.s		ft3, fs1, ft3		# Pos.Y + Speed.Y * DeltaTime
-			fadd.s		ft0, ft3, ft2		# ft0 = y + y offset
+			
+			# Colisao horizontal
+			li		t1, 8
+			fcvt.s.w	ft1, t1			# ft1 = 8
+			
+			fcvt.s.w	ft0, zero
+			flt.s		t1, ft0, fs2		# Speed.X > 0
+			bnez		t1, PHYSICS.COLL.X.RIGHT
+			flt.s		t1, fs2, ft0		# Speed.X < 0
+			bnez		t1, PHYSICS.COLL.X.LEFT
+			
+			j		PHYSICS.COLL.Y
+
+PHYSICS.COLL.X.RIGHT:	li		t1, HITBOX_Y_RIGHT_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = y offset
+			
+			fadd.s		ft0, ft3, ft4		# ft0 = y + y offset
 			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
 			fcvt.s.wu	ft0, t1
 			
 			li		t1, HITBOX_MAP_WIDTH
-			fcvt.s.w	ft2, t1			# ft2 = hitbox map width
+			fcvt.s.w	ft4, t1			# ft4 = hitbox map width
 			
-			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
+			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map width
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			add		t0, t0, t1		# t0 += t1
+			add		t4, t6, t1		# t0 += t1
+			
+			li		t1, HITBOX_X_RIGHT_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = x offset
+			
+			fadd.s		ft4, ft2, ft4		# ft4 = char x + offset
+			fdiv.s		ft5, ft4, ft1		# ft5 = x / 8
+			fcvt.wu.s	t1, ft5			# t1 = floor(ft2)
+			
+			add		t2, t4, t1		# t2 = t0 + t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.COLL.X.ZERO
+
+			lbu		t1, HITBOX_MAP_WIDTH(t2)
+			bnez		t1, PHYSICS.COLL.X.ZERO
+			
+			j		PHYSICS.COLL.Y
+
+PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = y offset
+			
+			fadd.s		ft0, ft3, ft4		# ft0 = y + y offset
+			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.s.wu	ft0, t1
+			
+			li		t1, HITBOX_MAP_WIDTH
+			fcvt.s.w	ft4, t1			# ft4 = hitbox map width
+			
+			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map width
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			add		t4, t6, t1		# t0 += t1
+			
+			li		t1, HITBOX_X_LEFT_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = x offset
+			
+			fadd.s		ft4, ft2, ft4		# ft4 = char x + offset
+			fdiv.s		ft5, ft4, ft1		# ft5 = x / 8
+			fcvt.wu.s	t1, ft5			# t1 = floor(ft2)
+			
+			add		t2, t4, t1		# t2 = t0 + t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.COLL.X.ZERO
+
+			lbu		t1, HITBOX_MAP_WIDTH(t2)
+			bnez		t1, PHYSICS.COLL.X.ZERO
+			
+			j		PHYSICS.COLL.Y
+
+PHYSICS.COLL.X.ZERO:	fcvt.s.w	fs2, zero		# Speed.X = 0
+
+PHYSICS.COLL.Y:		li		t1, 8
+			fcvt.s.w	ft1, t1			# ft1 = 8
+			
+			# Colisao do pe
+			# 	Calculo do Y
+			li		t1, HITBOX_Y_FEET_OFFSET
+			addi		t1, t1, -1
+			fcvt.s.w	ft4, t1			# ft4 = y offset
+			
+			fadd.s		ft0, ft3, ft4		# ft0 = y + y offset
+			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.s.wu	ft0, t1
+			
+			# 	Calculo do X
+			li		t1, HITBOX_MAP_WIDTH
+			fcvt.s.w	ft4, t1			# ft4 = hitbox map width
+			
+			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map width
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			add		t6, t6, t1		# t6 += t1
 			
 			li		t1, HITBOX_X_FEET_OFFSET
-			fcvt.s.w	ft3, t1			# ft2 = x offset
+			fcvt.s.w	ft4, t1			# ft4 = x offset
 			
-			fadd.s		ft3, fs0, ft3		# ft3 = char x + offset
-			fdiv.s		ft2, ft3, ft1		# ft2 = x / 8
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft2)
+			fadd.s		ft4, fs0, ft4		# ft4 = char x + offset
+			fdiv.s		ft5, ft4, ft1		# ft5 = x / 8
+			fcvt.wu.s	t1, ft5			# t1 = floor(ft5)
 			
-			add		t2, t0, t1		# t2 = t0 + t1
-			
-			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.ZEROX
-			
-			fadd.s		ft2, ft3, ft1		# ft2 = (char x + offset) + 8
-			fdiv.s		ft2, ft2, ft1		# ft2 = x / 8
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft2)
-			
-			add		t2, t0, t1		# t2 = t0 + t1
+			add		t2, t6, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.ZEROX
+			bnez		t1, PHYSICS.COLL.Y.ZERO
+			
+			fadd.s		ft5, ft4, ft1		# ft5 = (char x + offset) + 8
+			fdiv.s		ft5, ft5, ft1		# ft5 = x / 8
+			fcvt.wu.s	t1, ft5			# t1 = floor(ft5)
+			
+			add		t2, t6, t1		# t2 = t0 + t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.COLL.Y.ZERO
 			
 			j		PHYSICS.MOVE
 
-PHYSICS.ZEROX:		fcvt.s.w	fs3, zero		# Speed.Y = 0
+PHYSICS.COLL.Y.ZERO:	fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
@@ -387,8 +472,6 @@ PHYSICS.MOVE:		# MoveH
 			# MoveV
 			fmul.s		ft0, fs3, fa7		# y vel * deltaTime
 			fadd.s		fs1, fs1, ft0		# y += y vel * deltaTime
-			
-			# TODO: Handle collisions
 			
 			lw		s0, 8(sp)		# restaura s0
 			lw		ra, 4(sp)		# restaura ra
