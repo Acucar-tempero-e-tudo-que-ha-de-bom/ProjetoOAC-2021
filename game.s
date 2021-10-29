@@ -76,14 +76,14 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		# s4 = map y
 		#
 
-GAME_LOOP:	#
+GAME.LOOP:	#
 		# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
 		# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
 		#
 		csrr		t0, 3073		# t0 = current time
 		sub		t0, t0, s11		# t0 = current time - last frame time
 		li		t1, 16			# 16ms entre cada frame (1000ms/60fps)
-		bltu		t0, t1, GAME_LOOP	# enquanto n tiver passado 16ms, repete
+		bltu		t0, t1, GAME.LOOP	# enquanto n tiver passado 16ms, repete
 
 		li		t1, 1000
 		fcvt.s.w	ft0, t1			# ft0 = 1000
@@ -187,7 +187,7 @@ GAME_LOOP:	#
 		sw		s1, 0(t0)
 		xori		s1, s1, 1
 		
-		j GAME_LOOP
+		j GAME.LOOP
 		
 EXIT:		# Closes MAPA file
 		li		a7, 57
