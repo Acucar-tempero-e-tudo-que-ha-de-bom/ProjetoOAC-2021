@@ -1,11 +1,11 @@
 INPUT:		li		t1, KDMMIO_KEYDOWN_ADDRESS
-		lw		t0, 0(t1)		
-		andi		t0, t0, 1	
-  	 	beqz		t0, INPUT_ZERO	# se nao tiver input, retorna
+		lw		t0, 0(t1)
+		andi		t0, t0, 1
+  	 	beqz		t0, INPUT_ZERO	# se nao tiver input, zera as entradas
  
-		lw		t0, 4(t1)		# caso contrario, pega o valor que ta no buffer
+		lw		t0, 4(t1)	# se houver input, pega o valor que ta no buffer pra comparacao
 
-  		# compara pra saber qual input foi
+  		# Movimentos normais (lowercase)
   		li		t1, 'w'
   		beq		t0, t1, INPUT_W
   		li		t1, 'a'
@@ -19,6 +19,7 @@ INPUT:		li		t1, KDMMIO_KEYDOWN_ADDRESS
   		li		t1, 'q'
   		beq		t0, t1, INPUT_Q
   		
+  		# Dash (uppercase)
   		li		t1, 'W'
   		beq		t0, t1, INPUT_DASH_W
   		li		t1, 'A'
@@ -36,217 +37,215 @@ INPUT:		li		t1, KDMMIO_KEYDOWN_ADDRESS
   		li		t1, 'Z'
   		beq		t0, t1, INPUT_DASH_Z
   		
+  		# Teclas especiais
+  		# (talvez podemos fazer um pause depois?)
   		li		t1, 'p'
   		beq		t0, t1, EXIT
   		
 INPUT_ZERO:	la		t0, MOVEX
-		sw		zero, 0(t0)		# zera moveX, moveY, jump e dash (cada um e um byte, por isso usamos word, pra zerar os quatro)
-		sh		zero, 4(t0)
+		sw		zero, 0(t0)		# zera moveX, moveY, jump e dash (cada um eh um byte, por isso usamos word, pra zerar os quatro)
+		sh		zero, 4(t0)		# zera dashX e dashY (cada um eh um byte, por isso usamos half)
 		ret
 
-INPUT_INCR:	addi		t1, t1, 1
-		sb		t1, 0(t0)
-		ret
-
-INPUT_W:	la		t0,MOVEY
+INPUT_W:	la		t0, MOVEY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
 		la		t0, JUMP
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input jump = 1
 		
 		ret
 
 INPUT_A:	la		t0, MOVEX
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveX = -1 (esquerda)
 		
 		la		t0, CHAR_DIR
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# charDir = 1 (esquerda)
 		
 		ret
 
 INPUT_S:	la		t0, MOVEY
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveY = 1 (baixo)
 		ret
 
 INPUT_D:	la		t0, MOVEX
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveX = 1 (direita)
 		
 		la		t0, CHAR_DIR
-		sb		zero, 0(t0)
+		sb		zero, 0(t0)		# charDir = 0 (direita)
 		
 		ret
 
 INPUT_Q:	la		t0, MOVEY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
 		la		t0, MOVEX
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveX = -1 (esquerda)
 		
 		la		t0, JUMP
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input jump = 1
 		
 		la		t0, CHAR_DIR
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# charDir = 1 (esquerda)
 		
 		ret
 
 INPUT_E:	la		t0, MOVEY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveY = -1 (cima)
 		
 		la		t0, MOVEX
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# moveX = 1 (direita)
 		
 		la		t0, JUMP
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input jump = 1
 		
 		la		t0, CHAR_DIR
-		sb		zero, 0(t0)
+		sb		zero, 0(t0)		# charDir = 0 (direita)
 		
 		ret
 
 INPUT_DASH_W:	la		t0, DASHX
 		li		t1, 0
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = 0 (nem pra esquerda, nem pra direita)
 		
 		la		t0, DASHY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = -1 (cima)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		ret
 
 INPUT_DASH_A:	la		t0, DASHX
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
 		la		t0, DASHY
 		li		t1, 0
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = 0 (nem pra cima, nem pra baixo)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# charDir = 1 (esquerda)
 		
 		ret
 		
 INPUT_DASH_S:	la		t0, DASHX
 		li		t1, 0
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = 0 (nem pra esquerda, nem pra direita)
 		
 		la		t0, DASHY
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = 1 (baixo)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		ret
 		
 INPUT_DASH_D:	la		t0, DASHX
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
 		la		t0, DASHY
 		li		t1, 0
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = 0 (nem pra cima, nem pra baixo)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
-		sb		zero, 0(t0)
+		sb		zero, 0(t0)		# charDir = 0 (direita)
 		
 		ret
 
 INPUT_DASH_Q:	la		t0, DASHX
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
 		la		t0, DASHY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = -1 (cima)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# charDir = 1 (esquerda)
 		
 		ret
 
 INPUT_DASH_E:	la		t0, DASHX
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
 		la		t0, DASHY
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = -1 (cima)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
-		sb		zero, 0(t0)
+		sb		zero, 0(t0)		# charDir = 0 (direita)
 		
 		ret
 
 INPUT_DASH_C:	la		t0, DASHX
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = 1 (direita)
 		
 		la		t0, DASHY
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = 1 (baixo)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
-		sb		zero, 0(t0)
+		sb		zero, 0(t0)		# charDir = 0 (direita)
 		
 		ret
 
 INPUT_DASH_Z:	la		t0, DASHX
 		li		t1, -1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashX = -1 (esquerda)
 		
 		la		t0, DASHY
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# dashY = 1 (baixo)
 		
 		la		t0, DASH
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# input dash = 1
 		
 		la		t0, CHAR_DIR
 		li		t1, 1
-		sb		t1, 0(t0)
+		sb		t1, 0(t0)		# charDir = 1 (esquerda)
 		
 		ret
 
