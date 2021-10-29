@@ -101,51 +101,51 @@ PHYSICS.DASHTIMER:	# Reset dashes
 			sb		t1, 0(t0)		# dashes = 1
 			
 PHYSICS.CAN.DASH:	la		t0, DASH
-			lb		t0, 0(t0)	# t0 = dash pressed
+			lb		t0, 0(t0)		# t0 = dash pressed
 			
 			fcvt.s.w	ft0, zero
-			fle.s		t1, ft0, fs8	# t1 = dash timer <= 0
+			fle.s		t1, ft0, fs8		# t1 = dash timer <= 0
 			
 			la		t2, DASHES
 			lb		t2, 0(t2)
-			slt		t2, zero, t2	# t2 = dashes > 0
+			slt		t2, zero, t2		# t2 = dashes > 0
 			
-			and		t0, t0, t1	# t0 = dash pressed && dash timer <= 0
-			and		t0, t0, t2	# t0 = dash pressed && dash timer <= 0 && dashes > 0
+			and		t0, t0, t1		# t0 = dash pressed && dash timer <= 0
+			and		t0, t0, t2		# t0 = dash pressed && dash timer <= 0 && dashes > 0
 			beqz		t0, PHYSICS.H
 			
 PHYSICS.START.DASH:	la		t0, DASHES
-			lb		t1, 0(t0)	# t1 = dashes
+			lb		t1, 0(t0)		# t1 = dashes
 			
 			addi		a0, t1, -1
 			mv		a1, zero
 			call		MAX
 
-			sb		a0, 0(t0)	# save new dashes value as Math.Max(0, dashes - 1)
+			sb		a0, 0(t0)		# save new dashes value as Math.Max(0, dashes - 1)
 			
 			la		t0, DASHING
 			li		t1, 1
-			sb		t1, 0(t0)	# dashing = 1
+			sb		t1, 0(t0)		# dashing = 1
 			
 			# Dash timer
 			la		t0, DASHTIME
-			flw		fs8, 0(t0)	# load inital dash time in dash timer
+			flw		fs8, 0(t0)		# load inital dash time in dash timer
 			
 			li		t0, DASH_SPEED
-			fcvt.s.w	ft0, t0		# ft0 = dash speed
+			fcvt.s.w	ft0, t0			# ft0 = dash speed
 			# Dash X speed
 			la		t1, DASHX
 			lb		t1, 0(t1)
-			fcvt.s.w	ft1, t1		# ft1 = dash x direction
+			fcvt.s.w	ft1, t1			# ft1 = dash x direction
 			
-			fmul.s		fs2, ft1, ft0	# Speed.X = dash x speed
+			fmul.s		fs2, ft1, ft0		# Speed.X = dash x speed
 			
 			# Dash Y speed
 			la		t1, DASHY
 			lb		t1, 0(t1)
-			fcvt.s.w	ft1, t1		# ft1 = dash y direction
+			fcvt.s.w	ft1, t1			# ft1 = dash y direction
 			
-			fmul.s		fs3, ft1, ft0	# Speed.X = dash y speed
+			fmul.s		fs3, ft1, ft0		# Speed.X = dash y speed
 			
 			j 		PHYSICS.COLLISION
 			
@@ -377,10 +377,10 @@ PHYSICS.COLL.X.RIGHT:	li		t1, HITBOX_Y_RIGHT_OFFSET
 			add		t2, t4, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.COLL.X.ZERO
+			bnez		t1, PHYSICS.COLL.X.HIT
 
 			lbu		t1, HITBOX_MAP_WIDTH(t2)
-			bnez		t1, PHYSICS.COLL.X.ZERO
+			bnez		t1, PHYSICS.COLL.X.HIT
 			
 			j		PHYSICS.COLL.Y
 
@@ -409,14 +409,17 @@ PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
 			add		t2, t4, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.COLL.X.ZERO
+			bnez		t1, PHYSICS.COLL.X.HIT
 
 			lbu		t1, HITBOX_MAP_WIDTH(t2)
-			bnez		t1, PHYSICS.COLL.X.ZERO
+			bnez		t1, PHYSICS.COLL.X.HIT
 			
 			j		PHYSICS.COLL.Y
 
-PHYSICS.COLL.X.ZERO:	fcvt.s.w	fs2, zero		# Speed.X = 0
+PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
+			beq		t1, t2, PHYSICS.HIT.SPIKE
+			
+			fcvt.s.w	fs2, zero		# Speed.X = 0
 
 PHYSICS.COLL.Y:		li		t1, 8
 			fcvt.s.w	ft1, t1			# ft1 = 8
@@ -450,7 +453,7 @@ PHYSICS.COLL.Y:		li		t1, 8
 			add		t2, t6, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.COLL.Y.ZERO
+			bnez		t1, PHYSICS.COLL.Y.HIT
 			
 			fadd.s		ft5, ft4, ft1		# ft5 = (char x + offset) + 8
 			fdiv.s		ft5, ft5, ft1		# ft5 = x / 8
@@ -459,11 +462,14 @@ PHYSICS.COLL.Y:		li		t1, 8
 			add		t2, t6, t1		# t2 = t0 + t1
 			
 			lbu		t1, 0(t2)
-			bnez		t1, PHYSICS.COLL.Y.ZERO
+			bnez		t1, PHYSICS.COLL.Y.HIT
 			
 			j		PHYSICS.MOVE
 
-PHYSICS.COLL.Y.ZERO:	fcvt.s.w	fs3, zero		# Speed.Y = 0
+PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
+			beq		t1, t2, PHYSICS.HIT.SPIKE
+			
+			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
@@ -478,3 +484,5 @@ PHYSICS.MOVE:		# MoveH
 			addi		sp, sp, 8
 			
 PHYSICS.END:		ret
+
+PHYSICS.HIT.SPIKE:	j		EXIT
