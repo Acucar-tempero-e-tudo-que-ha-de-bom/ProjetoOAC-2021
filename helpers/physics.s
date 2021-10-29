@@ -424,6 +424,37 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 PHYSICS.COLL.Y:		li		t1, 8
 			fcvt.s.w	ft1, t1			# ft1 = 8
 			
+			# Colisao cabeca
+			li		t1, HITBOX_Y_TOP_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = y offset
+			
+			fadd.s		ft0, ft3, ft4		# ft0 = y + y offset
+			fdiv.s		ft0, ft0, ft1		# ft0 = y / 8
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.s.wu	ft0, t1
+			
+			li		t1, HITBOX_MAP_WIDTH
+			fcvt.s.w	ft4, t1			# ft4 = hitbox map width
+			
+			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map width
+			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			add		t4, t6, t1		# t0 += t1
+			
+			li		t1, HITBOX_X_TOP_OFFSET
+			fcvt.s.w	ft4, t1			# ft4 = x offset
+			
+			fadd.s		ft4, ft2, ft4		# ft4 = char x + offset
+			fdiv.s		ft5, ft4, ft1		# ft5 = x / 8
+			fcvt.wu.s	t1, ft5			# t1 = floor(ft2)
+			
+			add		t2, t4, t1		# t2 = t0 + t1
+			
+			lbu		t1, 0(t2)
+			bnez		t1, PHYSICS.COLL.Y.HIT
+
+			lbu		t1, 1(t2)
+			bnez		t1, PHYSICS.COLL.Y.HIT
+			
 			# Colisao do pe
 			# 	Calculo do Y
 			li		t1, HITBOX_Y_FEET_OFFSET
