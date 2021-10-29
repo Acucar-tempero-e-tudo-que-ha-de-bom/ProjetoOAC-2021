@@ -11,6 +11,8 @@
 
 CHAR_POS:	.float 8, 111
 
+CHAR_DIR:	.byte 0		# right: 0, left: 1
+
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
 JUMP:		.byte 0		# jump: 1, nothing: 0
@@ -143,9 +145,15 @@ GAME_LOOP:	#
 		sub a2,a2,s4
 		
 		la a3,FILE_CHAR_SIZE
-		la a4,FILE_CHAR_SIZE
+		la a4,FILE_CHAR_DRAW
 		mv a5,s1
-		li a6,0
+		
+		la t0, CHAR_DIR
+		lb t0, 0(t0)
+		
+		li t1, 32
+		mul a6, t0, t1
+		
 		li a7,0
 		call RENDER
 		
