@@ -196,7 +196,7 @@ GAME.LOOP:	#
 		call		RENDER
 		
 		lhu		t0, 0(t3)
-		addi		t0, t0, 1
+		addi		t0, t0, 2
 		li		t1, SNOW_MAX_X
 		blt		t0, t1, SNOW.SAVE.X		# snow x < max snow x
 		mv		t0, zero
