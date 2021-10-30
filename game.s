@@ -24,7 +24,7 @@ DASHY:		.byte 0		# up: -1, down: 1
 DASHES:		.byte 1
 DASHING:	.byte 0		# is the char dashing?
 
-INPUT_ZEROES:	.byte 0		# may be temporary
+SNOWX:		.half 0		# snow effect x
 
 .text		
 		# Open MAPA file
@@ -43,6 +43,11 @@ INPUT_ZEROES:	.byte 0		# may be temporary
 		la		a0, FILE_DEBUG
 		ecall
 		mv		s9, a0
+		
+		# Open SNOW file
+		la		a0, FILE_SNOW
+		ecall
+		mv		s8, a0
 
 		li		s1, 1
 		
@@ -176,6 +181,27 @@ GAME.LOOP:	#
 		li		a6, 0
 		li		a7, 0
 		call		RENDER
+		
+		# Draw SNOW
+		la		t3, SNOWX
+		
+		mv		a0, s8
+		mv		a1, zero
+		mv		a2, zero
+		la		a3, FILE_SNOW_SIZE
+		la		a4, SCREEN_SIZE
+		mv		a5, s1
+		lhu		a6, 0(t3)
+		mv		a7, zero
+		call		RENDER
+		
+		lhu		t0, 0(t3)
+		addi		t0, t0, 1
+		li		t1, SNOW_MAX_X
+		blt		t0, t1, SNOW.SAVE.X		# snow x < max snow x
+		mv		t0, zero
+
+SNOW.SAVE.X:	sh		t0, 0(t3)
 		
 		# Salva quando esse frame terminou de renderizar
 		# Usado pra garantir um framerate fixo no jogo

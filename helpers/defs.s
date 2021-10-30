@@ -82,3 +82,8 @@
 # Dash
 #
 .eqv DASH_SPEED			240
+
+#
+# Snow effect
+#
+.eqv SNOW_MAX_X			640	# snow width - screen width
