@@ -63,6 +63,10 @@ if len(sys.argv) == 2:
                 elif r == 255 and g == 100 and b == 0:
                     linha.append('4')
                     continue
+                # Verde (0, 255, 0) == 6 (refill)
+                elif r == 0 and g == 255 and b == 0:
+                    linha.append('6')
+                    continue
                 # Cor desconhecida
                 else:
                     print(f"Cor desconhecida: {r} {g} {b}")
