@@ -503,6 +503,9 @@ PHYSICS.COLL.Y:		li		t1, 8
 PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
 			
+			li		t2, 3			# trampolim = 3
+			beq		t1, t2, PHYSICS.HIT.TRAMPOLIM
+			
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
@@ -520,3 +523,10 @@ PHYSICS.MOVE:		# MoveH
 PHYSICS.END:		ret
 
 PHYSICS.HIT.SPIKE:	j		EXIT
+
+PHYSICS.HIT.TRAMPOLIM:	#fsgnjn.s	fs3, fs3, fs3
+			li		t0, TRAMPOLIM_SPEED
+			li		t1, -1
+			mul		t0, t0, t1
+			fcvt.s.w	fs3, t0			# ft0 = dash speed
+			j		PHYSICS.MOVE

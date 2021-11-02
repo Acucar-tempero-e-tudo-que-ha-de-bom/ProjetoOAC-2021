@@ -9,7 +9,7 @@
 # x, y
 #
 
-CHAR_POS:	.float 8, 111
+CHAR_POS:	.float 8, 288
 
 CHAR_DIR:	.byte 0, 0, 0, 0 # right: 0, left: 1
 
@@ -25,6 +25,12 @@ DASHES:		.byte 1
 DASHING:	.byte 0		# is the char dashing?
 
 SNOWX:		.half 0		# snow effect x
+
+MAP_POS:	.half 0, 180	# current map position
+FIXED_MAP:	.byte 1		# follow char = 0, fixed pos = 1
+
+MAP_TRANSITION:	.byte 0		# is map transitioning?
+MAP_TARGET_POS:	.half 0, 0	# final map pos
 
 .text		
 		# Open MAPA file
@@ -100,9 +106,12 @@ GAME.LOOP:	#
 	
 		# Calcular posicao do mapa de acordo com o personagem
 		# O personagem deve ficar sempre que possível no centro da tela
+		la		t0, FIXED_MAP
+		lb		t0, 0(t0)
+		bnez		t0, GAME.FIXED.MAP
 
 		# Calculo do x
-		fcvt.w.s	a0, fs0			# a0 = char x
+GAME.DYN.MAP:	fcvt.w.s	a0, fs0			# a0 = char x
 
 		addi		a0, a0, MAP_OFFSET_X	# a0 = char x - offset x do mapa (o mapa fica x pixels pra esquerda do personagem)
 		mv		a1, zero		# a1 = 0
@@ -114,7 +123,7 @@ GAME.LOOP:	#
 		mv		s3, a0			# move o resultado pra s3
 		
 		# Calculo do y
-		fcvt.w.s		a0, fs1		# a0 = char y
+		fcvt.w.s	a0, fs1		# a0 = char y
 		addi		a0, a0, MAP_OFFSET_Y	# a0 = char y - offset y do mapa (o mapa fica x pixels pra cima do personagem)
 		mv		a1, zero		# a1 = zero
 		call		MAX			# faz um MAX entre o resultado da conta e 0 (garante que o y do mapa seja >= 0)
@@ -123,8 +132,14 @@ GAME.LOOP:	#
 		call		MIN			# faz um MIN entre o resultado da conta e o MAXIMO que o mapa pode ir no eixo Y
 		
 		mv		s4, a0			# move o resultado pra s4
+		
+		j		GAME.RENDER
 
-		# Define os argumentos a0-a5 e desenha o mapa
+GAME.FIXED.MAP:	la		t0, MAP_POS
+		lhu		s3, 0(t0)
+		lhu		s4, 2(t0)
+
+GAME.RENDER:	# Define os argumentos a0-a5 e desenha o mapa
 		# os calculos pros argumentos a6-a7 são definidos acima
 		mv		a0, s0
 		li		a1, 0

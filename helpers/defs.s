@@ -84,6 +84,11 @@
 .eqv DASH_SPEED			240
 
 #
+# Trampolim
+#
+.eqv TRAMPOLIM_SPEED		300
+
+#
 # Snow effect
 #
 .eqv SNOW_MAX_X			640	# snow width - screen width

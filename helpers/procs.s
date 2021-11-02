@@ -40,7 +40,25 @@ APPROACH:	flt.s		t0, fa1, fa0	# target < val
 
 APPROACH.MAX:	fsub.s		fa0, fa0, fa2	# val - maxMove
 		fmax.s		fa0, fa0, fa1	# return Max(val - maxMove, target)
-		ret	
+		ret
+
+################### PROCEDIMENTO APPROACH.I #####################
+#	ARGUMENTOS:						#
+#		a0 = val					#
+#		a1 = target					#
+#		a2 = maxMove					#
+#	RETORNO:						#
+#		retorna em a0 o novo valor			#
+#################################################################
+
+APPROACH.I:	slt		t0, a1, a0	# target < val
+		bnez		t0, APPROACH.MAX 
+
+		add		a0, a0, a2	# val + maxMove
+		j		MIN
+
+APPROACH.I.MAX:	sub		a0, a0, a2	# val - maxMove
+		j		MAX
 
 ###################### PROCEDIMENTO SIGN ########################
 #	ARGUMENTOS:						#

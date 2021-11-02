@@ -32,7 +32,7 @@ if len(sys.argv) == 2:
     newFilename = filename[:-4]
     ext = '.s'
     with open(newFilename + ext, 'w') as writer:
-        writer.write(f"{newFilename}:\t.byte\n\t\t")
+        writer.write(f"{newFilename.upper()}:\t.byte\n\t\t")
         
         linhas = []
         for i in range(0, height, 8):
@@ -55,6 +55,15 @@ if len(sys.argv) == 2:
                 elif r == 255 and g == 0 and b == 0:
                     linha.append('2')
                     continue
+                # Marrom (120, 50, 0) == 3 (trampolim)
+                elif r == 120 and g == 50 and b == 0:
+                    linha.append('3')
+                    continue
+                # Laranja (255, 100, 0) == 4 (fase 1 pra fase 2)
+                elif r == 255 and g == 100 and b == 0:
+                    linha.append('4')
+                    continue
+                # Cor desconhecida
                 else:
                     print(f"Cor desconhecida: {r} {g} {b}")
             linhas.append(', '.join(linha))
