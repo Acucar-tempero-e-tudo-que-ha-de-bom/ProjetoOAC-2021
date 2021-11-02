@@ -11,7 +11,7 @@
 
 CHAR_POS:	.float 8, 111
 
-CHAR_DIR:	.byte 0		# right: 0, left: 1
+CHAR_DIR:	.byte 0, 0, 0, 0 # right: 0, left: 1
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1

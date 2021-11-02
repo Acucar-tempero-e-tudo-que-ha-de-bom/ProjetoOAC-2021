@@ -419,6 +419,9 @@ PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
 PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
 			
+			la		t0, JUMPGRACETIME	# resets grace timer if onGround
+			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
+			
 			fcvt.s.w	fs2, zero		# Speed.X = 0
 
 PHYSICS.COLL.Y:		li		t1, 8
