@@ -71,6 +71,11 @@ MAP_TARGET_POS:	.half 0, 0	# final map pos
 		
 		li		t0, MAX_FALL
 		fcvt.s.w	fs7, t0			# fs7 = max fall
+		
+		# Open REFILL file
+		la		a0, FILE_REFILL
+		ecall
+		mv		s6, a0
 
 		#
 		# Registradores que devem permanecer durante o loop
@@ -132,7 +137,7 @@ GAME.DYN.MAP:	fcvt.w.s	a0, fs0			# a0 = char x
 		call		MIN			# faz um MIN entre o resultado da conta e o MAXIMO que o mapa pode ir no eixo Y
 		
 		mv		s4, a0			# move o resultado pra s4
-		
+
 		j		GAME.RENDER
 
 GAME.FIXED.MAP:	la		t0, MAP_POS
@@ -150,6 +155,19 @@ GAME.RENDER:	# Define os argumentos a0-a5 e desenha o mapa
 		mv		a6, s3
 		mv		a7, s4
 		call		RENDER
+		
+		# Draw refill
+		mv 		a0, s6
+		li 		a1, 200
+		sub 		a1, a1, s3	# x - offset do x
+		li 		a2, 242
+		sub 		a2, a2, s4	# y - offset do y
+		la		a3, FILE_REFILL_SIZE
+		mv		a4, a3
+		mv		a5, s1
+		mv		a6, zero
+		mv		a7, zero
+		call 		RENDER
 		
 		# Draw char
 		mv		a0, s2

@@ -14,3 +14,6 @@ FILE_DEBUG_SIZE:	.half 8, 8
 
 FILE_SNOW:		.string "sprites/snow.bin"
 FILE_SNOW_SIZE:		.half 960, 180
+
+FILE_REFILL:		.string "sprites/idle00.bin"
+FILE_REFILL_SIZE:	.half 16, 16
