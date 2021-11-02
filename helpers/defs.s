@@ -15,7 +15,7 @@
 
 # Tamanho do mapa (mapa.bin)
 .eqv MAPA_WIDTH			640
-.eqv MAPA_HEIGHT		360
+.eqv MAPA_HEIGHT		544
 
 # Tamanho do personagem (char.bin)
 .eqv CHAR_WIDTH			32
@@ -86,9 +86,25 @@
 #
 # Trampolim
 #
-.eqv TRAMPOLIM_SPEED		300
+.eqv TRAMPOLIM_SPEED		-300
 
 #
 # Snow effect
 #
 .eqv SNOW_MAX_X			640	# snow width - screen width
+
+#
+# Transicoes de fase
+#
+
+# Fase 1 para Fase 2
+.eqv F1_TO_F2_TARGET_X		320
+.eqv F1_TO_F2_TARGET_Y		180
+.eqv F1_TO_F2_CHAR_X		320
+.eqv F1_TO_F2_CHAR_Y		296
+
+# Fase 2 para Fase 3
+.eqv F2_TO_F3_TARGET_X		256
+.eqv F2_TO_F3_TARGET_Y		0
+.eqv F2_TO_F3_CHAR_X		544
+.eqv F2_TO_F3_CHAR_Y		64

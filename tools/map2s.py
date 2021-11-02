@@ -63,6 +63,10 @@ if len(sys.argv) == 2:
                 elif r == 255 and g == 100 and b == 0:
                     linha.append('4')
                     continue
+                # Rosa (255, 0, 100) == 5 (fase 2 pra fase 3)
+                elif r == 255 and g == 0 and b == 100:
+                    linha.append('5')
+                    continue
                 # Cor desconhecida
                 else:
                     print(f"Cor desconhecida: {r} {g} {b}")

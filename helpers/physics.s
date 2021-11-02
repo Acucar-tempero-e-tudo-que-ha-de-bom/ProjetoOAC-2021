@@ -506,6 +506,12 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 3			# trampolim = 3
 			beq		t1, t2, PHYSICS.HIT.TRAMPOLIM
 			
+			li		t2, 4
+			beq		t1, t2, PHYSICS.HIT.F1.TO.F2
+			
+			li		t2, 5
+			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
+			
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
@@ -516,17 +522,61 @@ PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs3, fa7		# y vel * deltaTime
 			fadd.s		fs1, fs1, ft0		# y += y vel * deltaTime
 			
-			lw		s0, 8(sp)		# restaura s0
+PHYSICS.END:		lw		s0, 8(sp)		# restaura s0
 			lw		ra, 4(sp)		# restaura ra
 			addi		sp, sp, 8
 			
-PHYSICS.END:		ret
+			ret
 
 PHYSICS.HIT.SPIKE:	j		EXIT
+			#j		PHYSICS.END
 
-PHYSICS.HIT.TRAMPOLIM:	#fsgnjn.s	fs3, fs3, fs3
-			li		t0, TRAMPOLIM_SPEED
-			li		t1, -1
-			mul		t0, t0, t1
+PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 			fcvt.s.w	fs3, t0			# ft0 = dash speed
 			j		PHYSICS.MOVE
+
+PHYSICS.HIT.F1.TO.F2:	la		t0, MAP_TRANSITION
+			li		s5, 1
+			sb		s5, 0(t0)		# map trasitioning = 1
+			
+			la		t0, MAP_TARGET_POS
+			
+			li		t1, F1_TO_F2_TARGET_X
+			sh		t1, 0(t0)		# target x
+			
+			li		t1, F1_TO_F2_TARGET_Y
+			sh		t1, 2(t0)		# target y
+			
+			li		t1, F1_TO_F2_CHAR_X
+			fcvt.s.w	fs0, t1			# char x
+			
+			li		t1, F1_TO_F2_CHAR_Y
+			fcvt.s.w	fs1, t1			# char y
+			
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+			
+			j		PHYSICS.END
+
+PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
+			li		s5, 1
+			sb		s5, 0(t0)		# map trasitioning = 1
+			
+			la		t0, MAP_TARGET_POS
+			
+			li		t1, F2_TO_F3_TARGET_X
+			sh		t1, 0(t0)		# target x
+			
+			li		t1, F2_TO_F3_TARGET_Y
+			sh		t1, 2(t0)		# target y
+			
+			li		t1, F2_TO_F3_CHAR_X
+			fcvt.s.w	fs0, t1			# char x
+			
+			li		t1, F2_TO_F3_CHAR_Y
+			fcvt.s.w	fs1, t1			# char y
+			
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+			
+			j		PHYSICS.END

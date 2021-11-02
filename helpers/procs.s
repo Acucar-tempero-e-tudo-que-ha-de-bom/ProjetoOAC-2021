@@ -51,9 +51,7 @@ APPROACH.MAX:	fsub.s		fa0, fa0, fa2	# val - maxMove
 #		retorna em a0 o novo valor			#
 #################################################################
 
-APPROACH.I:	slt		t0, a1, a0	# target < val
-		bnez		t0, APPROACH.MAX 
-
+APPROACH.I:	blt		a1, a0, APPROACH.I.MAX	# target < val
 		add		a0, a0, a2	# val + maxMove
 		j		MIN
 
