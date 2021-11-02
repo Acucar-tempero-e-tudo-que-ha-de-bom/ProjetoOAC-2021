@@ -528,8 +528,18 @@ PHYSICS.END:		lw		s0, 8(sp)		# restaura s0
 			
 			ret
 
-PHYSICS.HIT.SPIKE:	j		EXIT
-			#j		PHYSICS.END
+PHYSICS.HIT.SPIKE:	la		t0, RESPAWN_POS
+
+			lhu		t1, 0(t0)
+			fcvt.s.w	fs0, t1			# respawn x pos
+			
+			lhu		t1, 2(t0)
+			fcvt.s.w	fs1, t1			# respawn y pos
+
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+
+			j		PHYSICS.END
 
 PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 			fcvt.s.w	fs3, t0			# ft0 = dash speed
@@ -547,11 +557,15 @@ PHYSICS.HIT.F1.TO.F2:	la		t0, MAP_TRANSITION
 			li		t1, F1_TO_F2_TARGET_Y
 			sh		t1, 2(t0)		# target y
 			
+			la		t0, RESPAWN_POS
+			
 			li		t1, F1_TO_F2_CHAR_X
 			fcvt.s.w	fs0, t1			# char x
+			sh		t1, 0(t0)
 			
 			li		t1, F1_TO_F2_CHAR_Y
 			fcvt.s.w	fs1, t1			# char y
+			sh		t1, 2(t0)
 			
 			fcvt.s.w	fs2, zero
 			fcvt.s.w	fs3, zero		# zeroes char speed
@@ -570,11 +584,15 @@ PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
 			li		t1, F2_TO_F3_TARGET_Y
 			sh		t1, 2(t0)		# target y
 			
+			la		t0, RESPAWN_POS
+			
 			li		t1, F2_TO_F3_CHAR_X
 			fcvt.s.w	fs0, t1			# char x
+			sh		t1, 0(t0)
 			
 			li		t1, F2_TO_F3_CHAR_Y
 			fcvt.s.w	fs1, t1			# char y
+			sh		t1, 2(t0)
 			
 			fcvt.s.w	fs2, zero
 			fcvt.s.w	fs3, zero		# zeroes char speed

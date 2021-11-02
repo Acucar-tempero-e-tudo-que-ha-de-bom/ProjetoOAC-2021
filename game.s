@@ -11,7 +11,9 @@
 
 CHAR_POS:	.float 8, 464
 
-CHAR_DIR:	.byte 0, 0, 0, 0 # right: 0, left: 1
+CHAR_DIR:	.byte 0		# right: 0, left: 1
+
+PLACEHOLDER:	.byte 0, 0, 0	# IGNORE
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
@@ -31,6 +33,8 @@ MAP_TARGET_POS:	.half 0, 0	# final map pos
 
 FIXED_MAP:	.byte 1		# follow char = 0, fixed pos = 1
 MAP_TRANSITION:	.byte 0		# is map transitioning?
+
+RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
 
 .text		
 			# Open MAPA file
