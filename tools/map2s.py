@@ -66,6 +66,9 @@ if len(sys.argv) == 2:
                 # Rosa (255, 0, 100) == 5 (fase 2 pra fase 3)
                 elif r == 255 and g == 0 and b == 100:
                     linha.append('5')
+                # Verde (0, 255, 0) == 6 (refill)
+                elif r == 0 and g == 255 and b == 0:
+                    linha.append('6')
                     continue
                 # Cor desconhecida
                 else:

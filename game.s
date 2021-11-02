@@ -59,6 +59,11 @@ RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
 			ecall
 			mv		s8, a0
 
+			# Open REFILL file
+			la		a0, FILE_REFILL
+			ecall
+			mv		s6, a0
+
 			li		s1, 1
 		
 			la		t0, CHAR_POS
@@ -151,7 +156,7 @@ GAME.RNDR.MAP:		la		t0, FIXED_MAP
 			bnez		t0, GAME.FIXED.MAP
 
 			# Calcular posicao do mapa de acordo com o personagem
-			# O personagem deve ficar sempre que possível no centro da tela
+			# O personagem deve ficar sempre que possï¿½vel no centro da tela
 			# Calculo do x
 GAME.DYN.MAP:		fcvt.w.s	a0, fs0			# a0 = char x
 
@@ -182,7 +187,7 @@ GAME.FIXED.MAP:		la		t0, MAP_POS
 			lhu		s4, 2(t0)
 
 GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
-			# os calculos pros argumentos a6-a7 são definidos acima
+			# os calculos pros argumentos a6-a7 sï¿½o definidos acima
 			mv		a0, s0
 			li		a1, 0
 			li		a2, 0
@@ -194,7 +199,20 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			call		RENDER
 		
 			bnez		s5, GAME.SNOW
-		
+
+			# Draw refill
+			mv 		a0, s6
+			li 		a1, 200
+			sub 	a1, a1, s3	# x - offset do x
+			li 		a2, 422
+			sub 	a2, a2, s4	# y - offset do y
+			la		a3, FILE_REFILL_SIZE
+			mv		a4, a3
+			mv		a5, s1
+			mv		a6, zero
+			mv		a7, zero
+			call 		RENDER
+			
 			# Draw char
 			mv		a0, s2
 		
