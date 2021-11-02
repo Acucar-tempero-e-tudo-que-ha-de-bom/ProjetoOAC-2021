@@ -418,6 +418,8 @@ PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
 
 PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
+			li		t2, 6			# refill = 6
+			beq		t1, t2, PHYSICS.HIT.REFILL
 			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
@@ -511,7 +513,10 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			
 			li		t2, 5
 			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
-			
+
+			li		t2, 6			# refill = 6
+			beq		t1, t2, PHYSICS.HIT.REFILL
+									
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
@@ -598,3 +603,12 @@ PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
 			fcvt.s.w	fs3, zero		# zeroes char speed
 			
 			j		PHYSICS.END
+			
+PHYSICS.HIT.REFILL:	# Coloca mais um dash pro personagem limitando a 2 dashes
+			la		t0, DASHES
+			lb		t1, 0(t0)
+			addi 		a0, t1, 1
+			li		a1, 2
+			call 		MIN
+			sb		a0, 0(t0)
+			j		PHYSICS.MOVE
