@@ -17,3 +17,6 @@ FILE_SNOW_SIZE:		.half 960, 180
 
 FILE_REFILL:		.string "sprites/refill.bin"
 FILE_REFILL_SIZE:	.half 16, 16
+
+FILE_MORANGO:		.string "sprites/morango.bin"
+FILE_MORANGO_SIZE:	.half 16, 16

@@ -40,6 +40,8 @@ FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
 
 REFILL_TIMER:	.word 0, 0, 0, 0, 0, 0
 
+MORANGOS:	.word 1
+
 .text
 START:			# Open MAPA file
 			li		a7, 1024
@@ -67,6 +69,11 @@ START:			# Open MAPA file
 			la		a0, FILE_REFILL
 			ecall
 			mv		s6, a0
+			
+			# Open MORANGO file
+			la		a0, FILE_MORANGO
+			ecall
+			mv		s7, a0
 
 			li		s1, 1
 		
@@ -251,25 +258,34 @@ REFILL.TIMER3:		lw		t0, 12(t6)
 			beqz		t0, REFILL.CRYSTAL3
 			addi		t0, t0, -1
 			sw		t0, 12(t6)
-			j		DRAW.CHAR
+			j		DRAW.MORANGO
 
 REFILL.CRYSTAL3:	li		a0, 764		# x
 			li		a1, 60		# y
 			call		PRINT.REFILL
 			
-			j		DRAW.CHAR
+			j		DRAW.MORANGO
 			
 DRAW.REFILL.LVL5:	lw		t0, 20(t6)
 			beqz		t0, REFILL.CRYSTAL4
 			addi		t0, t0, -1
 			sw		t0, 20(t6)
-			j		DRAW.CHAR
+			j		DRAW.MORANGO
 
 REFILL.CRYSTAL4:	li		a0, 124
-			bgt		s3, a0, DRAW.CHAR
+			bgt		s3, a0, DRAW.MORANGO
 			li		a1, 52
 			call		PRINT.REFILL
 
+DRAW.MORANGO:		la		t0, MORANGOS
+			lw		t1, 0(t0)
+			beqz		t1, DRAW.CHAR
+
+			li		a0, 288
+			bgt		s3, a0, DRAW.CHAR
+			li		a1, 32
+			call		PRINT.MORANGO
+			
 DRAW.CHAR:		# Draw char
 			mv		a0, s2
 		

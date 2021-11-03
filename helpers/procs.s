@@ -109,3 +109,29 @@ PRINT.REFILL:
 		lw		ra, 0(sp)
 		addi		sp, sp, 4
 		ret
+
+################## PROCEDIMENTO PRINT MORANGO ###################
+#	ARGUMENTOS:						#
+#		a0 = x na tela					#
+#		a1 = y na tela					#
+#################################################################
+
+PRINT.MORANGO:
+		addi		sp, sp, -4
+		sw		ra, 0(sp)
+		
+		mv		a2, a1
+		mv		a1, a0
+		sub		a1, a1, s3	# x - offset
+		sub		a2, a2, s4	# y - offset
+		mv		a0, s7		# a0 = file descriptor		
+		la		a3, FILE_MORANGO_SIZE
+		mv		a4, a3
+		mv		a5, s1
+		mv		a6, zero
+		mv		a7, zero
+		call		RENDER
+
+		lw		ra, 0(sp)
+		addi		sp, sp, 4
+		ret

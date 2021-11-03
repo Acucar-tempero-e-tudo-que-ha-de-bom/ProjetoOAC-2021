@@ -426,6 +426,9 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
+			li		t2, 9
+			beq		t1, t2, PHYSICS.HIT.MORANGO
+			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 			
@@ -519,30 +522,32 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 5
 			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
 
-			li		t2, 20			# refill = 20
-			bge		t1, t2, PHYSICS.HIT.REFILL
-									
-			
 			li		t2, 7
 			beq		t1, t2, PHYSICS.HIT.F3.TO.F4
-			
+
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
+			li		t2, 9
+			beq		t1, t2, PHYSICS.HIT.MORANGO
+			
+			li		t2, 20			# refill = 20
+			bge		t1, t2, PHYSICS.HIT.REFILL
+
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
 			fadd.s		fs0, fs0, ft0		# x += x vel * deltaTime
-			
+
 			# MoveV
 			fmul.s		ft0, fs3, fa7		# y vel * deltaTime
 			fadd.s		fs1, fs1, ft0		# y += y vel * deltaTime
-			
+
 PHYSICS.END:		lw		s0, 8(sp)		# restaura s0
 			lw		ra, 4(sp)		# restaura ra
 			addi		sp, sp, 8
-			
+
 			ret
 
 PHYSICS.HIT.SPIKE:	la		t0, RESPAWN_POS
@@ -564,7 +569,20 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 
 PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
-			
+
+PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
+			j		PHYSICS.END
+
+PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
+			j		PHYSICS.END
+
+PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
+			j		PHYSICS.END
+
+PHYSICS.HIT.MORANGO:	la		t0, MORANGOS
+			sw		zero, 0(t0)
+			j		PHYSICS.MOVE
+
 PHYSICS.HIT.REFILL:	addi		t1, t1, -20
 			li		t0, 4
 			mul		t1, t1, t0
@@ -586,12 +604,3 @@ PHYSICS.HIT.REFILL:	addi		t1, t1, -20
 			sb		a0, 0(t0)
 			
 			j		PHYSICS.MOVE
-
-PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
-			j		PHYSICS.END
-
-PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
-			j		PHYSICS.END
-
-PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
-			j		PHYSICS.END
