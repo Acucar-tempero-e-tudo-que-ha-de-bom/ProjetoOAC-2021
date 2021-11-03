@@ -529,7 +529,7 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
-			li		t2, 9
+			li		t2, 10
 			beq		t1, t2, PHYSICS.HIT.MORANGO
 			
 			li		t2, 20			# refill = 20
@@ -579,7 +579,11 @@ PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
 PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
 			j		PHYSICS.END
 
-PHYSICS.HIT.MORANGO:	la		t0, MORANGOS
+PHYSICS.HIT.MORANGO:	li t0, 1
+			li a7,1
+			ecall
+			
+			la		t0, MORANGOS
 			lw		t1, 0(t0)
 			beqz		t1, PHYSICS.MOVE
 			sw		zero, 0(t0)
