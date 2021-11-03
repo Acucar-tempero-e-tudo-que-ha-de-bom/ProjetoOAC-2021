@@ -38,7 +38,11 @@ RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
 FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
 
-REFILL_TIMER:	.word	0, 0, 0, 0, 0, 0
+REFILL_TIMER:	.word 0, 0, 0, 0, 0, 0
+
+MORANGOS:	.word 1
+
+CHAR_WALK_ANIM:	.word 0
 
 ALREADY_TALKED:		.byte 0
 
@@ -55,11 +59,6 @@ START:			# Open MAPA file
 			ecall
 			mv		s2, a0
 		
-			# Open DEBUG file
-			#la		a0, FILE_DEBUG
-			#ecall
-			#mv		s9, a0
-		
 			# Open SNOW file
 			la		a0, FILE_SNOW
 			ecall
@@ -69,6 +68,11 @@ START:			# Open MAPA file
 			la		a0, FILE_REFILL
 			ecall
 			mv		s6, a0
+			
+			# Open MORANGO file
+			la		a0, FILE_MORANGO
+			ecall
+			mv		s7, a0
 
 			li		s1, 1
 		
@@ -212,35 +216,98 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			bnez		s5, GAME.SNOW
 		
 			# Draw refill level 4
+			la		t6, REFILL_TIMER
+			
 			li		t0, 4
 			la		t1, FASE_ATUAL
 			lb		t1, 0(t1)
 			bne		t0, t1, DRAW.REFILL.LVL5
 			
-			li		a0, 868
+			lw		t0, 0(t6)
+			beqz		t0, REFILL.CRYSTAL0
+			addi		t0, t0, -1
+			sw		t0, 0(t6)
+			j		REFILL.TIMER1
+
+REFILL.CRYSTAL0:	li		a0, 868
 			li		a1, 68
 			call		PRINT.REFILL
 			
-			li		a0, 828
+REFILL.TIMER1:		lw		t0, 4(t6)
+			beqz		t0, REFILL.CRYSTAL1
+			addi		t0, t0, -1
+			sw		t0, 4(t6)
+			j		REFILL.TIMER2
+
+REFILL.CRYSTAL1:	li		a0, 828
 			li		a1, 44
 			call		PRINT.REFILL
 			
-			li		a0, 796
+REFILL.TIMER2:		lw		t0, 8(t6)
+			beqz		t0, REFILL.CRYSTAL2
+			addi		t0, t0, -1
+			sw		t0, 8(t6)
+			j		REFILL.TIMER3
+
+REFILL.CRYSTAL2:	li		a0, 796
 			li		a1, 84
 			call		PRINT.REFILL
 			
-			li		a0, 764		# x
+REFILL.TIMER3:		lw		t0, 12(t6)
+			beqz		t0, REFILL.CRYSTAL3
+			addi		t0, t0, -1
+			sw		t0, 12(t6)
+			j		DRAW.MORANGO
+
+REFILL.CRYSTAL3:	li		a0, 764		# x
 			li		a1, 60		# y
 			call		PRINT.REFILL
-			j		DRAW.CHAR
 			
-DRAW.REFILL.LVL5:	
-			li		a0, 124
-			bgt		s3, a0, DRAW.CHAR
+			j		DRAW.MORANGO
+			
+DRAW.REFILL.LVL5:	lw		t0, 20(t6)
+			beqz		t0, REFILL.CRYSTAL4
+			addi		t0, t0, -1
+			sw		t0, 20(t6)
+			j		DRAW.MORANGO
+
+REFILL.CRYSTAL4:	li		a0, 124
+			bgt		s3, a0, DRAW.MORANGO
 			li		a1, 52
 			call		PRINT.REFILL
 
-DRAW.CHAR:		# Draw char
+DRAW.MORANGO:		la		t0, MORANGOS
+			lw		t1, 0(t0)
+			beqz		t1, DRAW.CHAR
+
+			li		a0, 288
+			bgt		s3, a0, DRAW.CHAR
+			li		a1, 32
+			call		PRINT.MORANGO
+			
+DRAW.CHAR:		fcvt.w.s	t0, fs2
+			beqz		t0, DRAW.CHAR.ZERO.X
+			
+			la		t0, CHAR_WALK_ANIM
+			lw		t1, 0(t0)
+			addi		t1, t1, 1
+			sw		t1, 0(t0)
+			
+			li		t2, 12
+			bgt		t1, t2, DRAW.CHAR.MAX.X
+			
+			j		DRAW.CHAR.START
+
+DRAW.CHAR.ZERO.X:	la		t0, CHAR_WALK_ANIM
+			sw		zero, 0(t0)
+			
+			j DRAW.CHAR.START
+
+DRAW.CHAR.MAX.X:	la		t0, CHAR_WALK_ANIM
+			li		t1, 1
+			sw		t1, 0(t0)
+
+DRAW.CHAR.START:	# Draw char
 			mv		a0, s2
 		
 			# Calculo da posicao do personagem na tela em relacao ao mapa
@@ -262,29 +329,20 @@ DRAW.CHAR:		# Draw char
 		
 			li		t1, 32
 			mul		a6, t0, t1
+			
+			la		t0, CHAR_WALK_ANIM
+			lw		t0, 0(t0)
+			li		t1, 32
+			mul		a7, t0, t1
 		
-			li		a7, 0
+			la		t0, DASHES
+			lbu		t0, 0(t0)
+			sltiu		t1, t0, 1
+			li		t0, 416
+			mul		t1, t1, t0
+			add		a7, a7, t1
+			
 			call		RENDER
-		
-			# Draw DEBUG
-			#mv		a0, s9
-		
-			#li		t0, 80
-			#li		t1, 8
-			#rem		a1, s10, t0
-			#mul		a1, a1, t1
-			#sub		a1, a1, s3
-
-			#div		a2, s10, t0
-			#mul		a2, a2, t1
-			#sub		a2, a2, s4
-		
-			#la		a3, FILE_DEBUG_SIZE
-			#la		a4, FILE_DEBUG_SIZE
-			#mv		a5, s1
-			#li		a6, 0
-			#li		a7, 0
-			#call		RENDER
 		
 GAME.SNOW:		# Draw SNOW
 			la		t3, SNOWX

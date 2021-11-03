@@ -74,6 +74,10 @@ if len(sys.argv) == 2:
                 elif r == 255 and g == 255 and b == 0:
                     linha.append('8')
                     continue
+                # Vermelho escuro (127, 0, 0) == 9 (morango)
+                elif r == 127 and g == 0 and b == 0:
+                    linha.append('9')
+                    continue
                 # Verde (0, 255, 0) == 2 + [idx] (refill)
                 elif g == 255 and b == 0:
                     linha.append('2' + str(r))

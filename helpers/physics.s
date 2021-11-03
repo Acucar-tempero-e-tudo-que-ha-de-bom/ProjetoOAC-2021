@@ -46,8 +46,6 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
 			add		t0, t0, t1		# t0 += t1
-			
-			mv		s10, t1
 
 			# Calculo do X
 			li		t1, HITBOX_X_FEET_OFFSET
@@ -58,8 +56,6 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
 			add		t2, t0, t1		# t2 = t0 + t1
-			
-			add		s10, s10, t1
 						
 			lbu		t1, 0(t2)
 			bnez		t1, PHYSICS.ONGROUND
@@ -428,6 +424,9 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
+			li		t2, 9
+			beq		t1, t2, PHYSICS.HIT.MORANGO
+			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 			
@@ -524,30 +523,32 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 5
 			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
 
-			li		t2, 20			# refill = 20
-			bge		t1, t2, PHYSICS.HIT.REFILL
-									
-			
 			li		t2, 7
 			beq		t1, t2, PHYSICS.HIT.F3.TO.F4
-			
+
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
+			li		t2, 9
+			beq		t1, t2, PHYSICS.HIT.MORANGO
+			
+			li		t2, 20			# refill = 20
+			bge		t1, t2, PHYSICS.HIT.REFILL
+
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
 			fmul.s		ft0, fs2, fa7		# x vel * deltaTime
 			fadd.s		fs0, fs0, ft0		# x += x vel * deltaTime
-			
+
 			# MoveV
 			fmul.s		ft0, fs3, fa7		# y vel * deltaTime
 			fadd.s		fs1, fs1, ft0		# y += y vel * deltaTime
-			
+
 PHYSICS.END:		lw		s0, 8(sp)		# restaura s0
 			lw		ra, 4(sp)		# restaura ra
 			addi		sp, sp, 8
-			
+
 			ret
 
 PHYSICS.HIT.SPIKE:	la		t0, RESPAWN_POS
@@ -570,15 +571,6 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
 			
-PHYSICS.HIT.REFILL:	# Coloca mais um dash pro personagem limitando a 2 dashes
-			la		t0, DASHES
-			lb		t1, 0(t0)
-			addi 		a0, t1, 1
-			li		a1, 2
-			call 		MIN
-			sb		a0, 0(t0)
-			j		PHYSICS.MOVE
-			
 PHYSICS.HIT.TALK:	call		TALK
 			j		PHYSICS.MOVE
 
@@ -590,3 +582,34 @@ PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
 
 PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
 			j		PHYSICS.END
+
+PHYSICS.HIT.MORANGO:	la		t0, MORANGOS
+			lw		t1, 0(t0)
+			beqz		t1, PHYSICS.MOVE
+			sw		zero, 0(t0)
+			call		SFX.MORANGO
+			j		PHYSICS.MOVE
+
+PHYSICS.HIT.REFILL:	addi		t1, t1, -20
+			li		t0, 4
+			mul		t1, t1, t0
+			
+			la		t0, REFILL_TIMER
+			add		t0, t0, t1
+			lw		t1, 0(t0)
+			bnez		t1, PHYSICS.MOVE
+			
+			li		t1, 70
+			sw		t1, 0(t0)
+			
+			# Coloca mais um dash pro personagem limitando a 2 dashes
+			la		t0, DASHES
+			lb		t1, 0(t0)
+			addi 		a0, t1, 1
+			li		a1, 2
+			call 		MIN
+			sb		a0, 0(t0)
+			
+			call		SFX.REFILL
+			
+			j		PHYSICS.MOVE

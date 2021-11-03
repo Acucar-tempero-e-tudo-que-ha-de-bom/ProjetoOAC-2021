@@ -6,7 +6,7 @@ FILE_MAP:		.string "sprites/mapa.bin"
 FILE_MAP_SIZE:		.half 1320, 728
 
 FILE_CHAR:		.string "sprites/char.bin"
-FILE_CHAR_SIZE:		.half 64, 32
+FILE_CHAR_SIZE:		.half 64, 832
 FILE_CHAR_DRAW:		.half 32, 32
 
 FILE_DEBUG:		.string "sprites/debug.bin"
@@ -29,3 +29,5 @@ FILE_TALK3:		.string "sprites/talk3.bin"
 FILE_TALK4:		.string "sprites/talk4.bin"
 
 
+FILE_MORANGO:		.string "sprites/morango.bin"
+FILE_MORANGO_SIZE:	.half 16, 16
