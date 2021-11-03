@@ -60,6 +60,11 @@ START:			# Open MAPA file
 			la		a0, FILE_SNOW
 			ecall
 			mv		s8, a0
+			
+			# Open REFILL file
+			la		a0, FILE_REFILL
+			ecall
+			mv		s6, a0
 
 			li		s1, 1
 		
@@ -94,6 +99,7 @@ START:			# Open MAPA file
 			# s3 = map x
 			# s4 = map y
 			# s5 = transitioning map
+			# s6 = refill descriptor
 			#
 
 GAME.LOOP:		#
@@ -200,6 +206,19 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			call		RENDER
 		
 			bnez		s5, GAME.SNOW
+		
+			# Draw refill
+			mv		a0, s6	# a0 = file descriptor
+			li		a1, 764	# x
+			sub		a1, a1, s3
+			li		a2, 60	# y
+			sub		a2, a2, s4
+			la		a3, FILE_REFILL_SIZE
+			mv		a4, a4
+			mv		a5, s1
+			mv		a6, zero
+			mv		a7, zero
+			call		RENDER
 		
 			# Draw char
 			mv		a0, s2
