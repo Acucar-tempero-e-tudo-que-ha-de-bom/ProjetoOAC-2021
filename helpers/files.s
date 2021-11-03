@@ -6,7 +6,7 @@ FILE_MAP:		.string "sprites/mapa.bin"
 FILE_MAP_SIZE:		.half 1320, 728
 
 FILE_CHAR:		.string "sprites/char.bin"
-FILE_CHAR_SIZE:		.half 64, 32
+FILE_CHAR_SIZE:		.half 64, 64
 FILE_CHAR_DRAW:		.half 32, 32
 
 FILE_DEBUG:		.string "sprites/debug.bin"

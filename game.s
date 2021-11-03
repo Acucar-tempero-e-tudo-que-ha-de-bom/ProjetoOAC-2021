@@ -309,7 +309,12 @@ DRAW.CHAR:		# Draw char
 			li		t1, 32
 			mul		a6, t0, t1
 		
-			li		a7, 0
+			la		t0, DASHES
+			lbu		t0, 0(t0)
+			sltiu		t1, t0, 1
+			li		t0, 32
+			mul		a7, t1, t0
+			
 			call		RENDER
 		
 			# Draw DEBUG
