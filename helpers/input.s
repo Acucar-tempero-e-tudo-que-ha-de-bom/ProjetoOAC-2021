@@ -39,6 +39,12 @@ INPUT:		li		t1, KDMMIO_KEYDOWN_ADDRESS
   		
   		# Teclas especiais
   		# (talvez podemos fazer um pause depois?)
+  		li		t1, 'o'
+  		beq		t0, t1, INPUT.RESPAWN
+  		li		t1, 'y'
+  		beq		t0, t1, INPUT.DASHES
+  		li		t1, 't'
+  		beq		t0, t1, INPUT.CHEAT
   		li		t1, 'p'
   		beq		t0, t1, EXIT
   		
@@ -249,3 +255,54 @@ INPUT.DASH.Z:	la		t0, DASHX
 		
 		ret
 
+INPUT.RESPAWN:	la		t0, RESPAWN_POS
+
+		lhu		t1, 0(t0)
+		fcvt.s.w	fs0, t1			# respawn x pos
+			
+		lhu		t1, 2(t0)
+		fcvt.s.w	fs1, t1			# respawn y pos
+
+		fcvt.s.w	fs2, zero
+		fcvt.s.w	fs3, zero		# zeroes char speed
+
+		ret
+
+INPUT.DASHES:	la		t0, DASHES
+		li		t1, 10
+		sb		t1, 0(t0)		# dashes = 10
+		
+		ret
+
+INPUT.CHEAT:	la		t0, FASE_ATUAL
+		lb		t0, 0(t0)
+		
+		addi		sp, sp, -4
+		sw		ra, 4(sp)		# salva ra
+		
+		li		t1, 1
+		beq		t0, t1, INPUT.CHEAT.2
+		li		t1, 2
+		beq		t0, t1, INPUT.CHEAT.3
+		li		t1, 3
+		beq		t0, t1, INPUT.CHEAT.4
+		li		t1, 4
+		beq		t0, t1, INPUT.CHEAT.5
+		
+		j		INPUT.CHEAT.RT
+
+INPUT.CHEAT.2:	call		F1.TO.F2
+		j		INPUT.CHEAT.RT
+
+INPUT.CHEAT.3:	call		F2.TO.F3
+		j		INPUT.CHEAT.RT
+
+INPUT.CHEAT.4:	call		F3.TO.F4
+		j		INPUT.CHEAT.RT
+
+INPUT.CHEAT.5:	call		F4.TO.F5
+		j		INPUT.CHEAT.RT
+
+INPUT.CHEAT.RT:	lw		ra, 4(sp)		# restaura ra
+		addi		sp, sp, 4
+		ret

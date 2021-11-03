@@ -31,7 +31,7 @@
 # por isso coloquei -120.
 #
 .eqv MAP_OFFSET_X		-144
-.eqv MAP_OFFSET_Y		-120
+.eqv MAP_OFFSET_Y		-130
 
 #
 # Valor maximo pra "camera de mapa"
@@ -116,7 +116,7 @@
 .eqv F3_TO_F4_CHAR_Y		104
 
 # Fase 4 para Fase 5
-.eqv F4_TO_F5_TARGET_X		304
+.eqv F4_TO_F5_TARGET_X		320
 .eqv F4_TO_F5_TARGET_Y		0
 .eqv F4_TO_F5_CHAR_X		600
 .eqv F4_TO_F5_CHAR_Y		128

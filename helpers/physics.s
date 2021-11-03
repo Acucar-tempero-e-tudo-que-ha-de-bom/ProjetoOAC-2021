@@ -97,7 +97,7 @@ PHYSICS.DASHTIMER:	# Reset dashes
 			beqz		s0, PHYSICS.CAN.DASH	# if not onGround, continue
 			
 			la		t0, DASHES
-			li		t1, 10
+			li		t1, 1
 			sb		t1, 0(t0)		# dashes = 1
 			
 PHYSICS.CAN.DASH:	la		t0, DASH
@@ -554,113 +554,14 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 			fcvt.s.w	fs3, t0			# ft0 = dash speed
 			j		PHYSICS.MOVE
 
-PHYSICS.HIT.F1.TO.F2:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F1_TO_F2_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F1_TO_F2_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F1_TO_F2_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F1_TO_F2_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
 
-PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F2_TO_F3_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F2_TO_F3_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F2_TO_F3_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F2_TO_F3_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
 			j		PHYSICS.END
 
-PHYSICS.HIT.F3.TO.F4:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F3_TO_F4_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F3_TO_F4_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F3_TO_F4_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F3_TO_F4_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
 			j		PHYSICS.END
 
-PHYSICS.HIT.F4.TO.F5:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F4_TO_F5_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F4_TO_F5_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F4_TO_F5_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F4_TO_F5_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			la		t0, FIXED_MAP
-			sb		zero, 0(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
 			j		PHYSICS.END

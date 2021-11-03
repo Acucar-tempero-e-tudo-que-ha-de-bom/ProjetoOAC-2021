@@ -36,6 +36,8 @@ MAP_TRANSITION:	.byte 0		# is map transitioning?
 
 RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
+FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
+
 .text		
 			# Open MAPA file
 			li		a7, 1024
@@ -294,5 +296,6 @@ EXIT:			# Closes MAPA file
 .include "helpers/input.s"
 .include "helpers/render.s"
 .include "helpers/physics.s"
+.include "helpers/fases.s"
 .include "helpers/procs.s"
 
