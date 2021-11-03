@@ -147,6 +147,8 @@ PHYSICS.START.DASH:	la		t0, DASHES
 			
 			fmul.s		fs3, ft1, ft0		# Speed.X = dash y speed
 			
+			call		SFX.DASH
+			
 			j 		PHYSICS.COLLISION
 			
 			# Horizontal Movement
