@@ -602,6 +602,6 @@ PHYSICS.HIT.REFILL:	addi		t1, t1, -20
 			call 		MIN
 			sb		a0, 0(t0)
 			
-			call		SFX.MORANGO
+			call		SFX.REFILL
 			
 			j		PHYSICS.MOVE
