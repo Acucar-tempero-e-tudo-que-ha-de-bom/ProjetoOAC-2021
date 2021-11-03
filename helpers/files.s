@@ -24,6 +24,7 @@ FILE_TALK0_SIZE:	.half 300, 28
 FILE_TALK1:		.string "sprites/talk1.bin"
 FILE_TALK2:		.string "sprites/talk2.bin"
 FILE_TALK3:		.string "sprites/talk3.bin"
+FILE_TALK4:		.string "sprites/talk4.bin"
 
 FILE_TALK_ANA_SIZE:	.half 288, 56
 FILE_TALK_JLM_SIZE:	.half 280, 48

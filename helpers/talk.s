@@ -83,6 +83,27 @@ TALK:
 		
 		#######################
 		
+		la		a0, FILE_TALK4	# "sim, sou eu"
+		li		a1, 0
+		li		a7, 1024
+		ecall
+		
+		li		a1, 18	# x
+		li		a2, 46	# y
+		
+		la		a3, FILE_TALK_ANA_SIZE
+		mv		a4, a3
+		xori		a5, s1, 1
+		mv		a6, zero
+		mv		a7, zero
+		call		RENDER
+		call		AWAIT.KEYBOARD
+		
+		li		a7, 57
+		ecall
+		
+		#######################
+		
 		la		t0, ALREADY_TALKED
 		li		t1, 1
 		sb		t1, 0(t0)
