@@ -38,6 +38,8 @@ RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
 FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
 
+REFILL_TIMER:	.word	0, 0, 0, 0, 0, 0
+
 .text
 START:			# Open MAPA file
 			li		a7, 1024
@@ -207,20 +209,36 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 		
 			bnez		s5, GAME.SNOW
 		
-			# Draw refill
-			mv		a0, s6	# a0 = file descriptor
-			li		a1, 764	# x
-			sub		a1, a1, s3
-			li		a2, 60	# y
-			sub		a2, a2, s4
-			la		a3, FILE_REFILL_SIZE
-			mv		a4, a4
-			mv		a5, s1
-			mv		a6, zero
-			mv		a7, zero
-			call		RENDER
-		
-			# Draw char
+			# Draw refill level 4
+			li		t0, 4
+			la		t1, FASE_ATUAL
+			lb		t1, 0(t1)
+			bne		t0, t1, DRAW.REFILL.LVL5
+			
+			li		a0, 868
+			li		a1, 68
+			call		PRINT.REFILL
+			
+			li		a0, 828
+			li		a1, 44
+			call		PRINT.REFILL
+			
+			li		a0, 796
+			li		a1, 84
+			call		PRINT.REFILL
+			
+			li		a0, 764		# x
+			li		a1, 60		# y
+			call		PRINT.REFILL
+			j		DRAW.CHAR
+			
+DRAW.REFILL.LVL5:	
+			li		a0, 124
+			bgt		s3, a0, DRAW.CHAR
+			li		a1, 52
+			call		PRINT.REFILL
+
+DRAW.CHAR:		# Draw char
 			mv		a0, s2
 		
 			# Calculo da posicao do personagem na tela em relacao ao mapa

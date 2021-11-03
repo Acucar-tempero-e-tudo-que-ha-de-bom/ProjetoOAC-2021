@@ -420,8 +420,8 @@ PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
 
 PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
-			li		t2, 6			# refill = 6
-			beq		t1, t2, PHYSICS.HIT.REFILL
+			li		t2, 20			# refill = 20
+			bge		t1, t2, PHYSICS.HIT.REFILL
 			
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
@@ -519,8 +519,8 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 5
 			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
 
-			li		t2, 6			# refill = 6
-			beq		t1, t2, PHYSICS.HIT.REFILL
+			li		t2, 20			# refill = 20
+			bge		t1, t2, PHYSICS.HIT.REFILL
 									
 			
 			li		t2, 7
