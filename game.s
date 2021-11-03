@@ -42,6 +42,8 @@ REFILL_TIMER:	.word 0, 0, 0, 0, 0, 0
 
 MORANGOS:	.word 1
 
+CHAR_WALK_ANIM:	.word 0
+
 .text
 START:			# Open MAPA file
 			li		a7, 1024
@@ -54,11 +56,6 @@ START:			# Open MAPA file
 			la		a0, FILE_CHAR
 			ecall
 			mv		s2, a0
-		
-			# Open DEBUG file
-			#la		a0, FILE_DEBUG
-			#ecall
-			#mv		s9, a0
 		
 			# Open SNOW file
 			la		a0, FILE_SNOW
@@ -286,7 +283,29 @@ DRAW.MORANGO:		la		t0, MORANGOS
 			li		a1, 32
 			call		PRINT.MORANGO
 			
-DRAW.CHAR:		# Draw char
+DRAW.CHAR:		fcvt.w.s	t0, fs2
+			beqz		t0, DRAW.CHAR.ZERO.X
+			
+			la		t0, CHAR_WALK_ANIM
+			lw		t1, 0(t0)
+			addi		t1, t1, 1
+			sw		t1, 0(t0)
+			
+			li		t2, 12
+			bgt		t1, t2, DRAW.CHAR.MAX.X
+			
+			j		DRAW.CHAR.START
+
+DRAW.CHAR.ZERO.X:	la		t0, CHAR_WALK_ANIM
+			sw		zero, 0(t0)
+			
+			j DRAW.CHAR.START
+
+DRAW.CHAR.MAX.X:	la		t0, CHAR_WALK_ANIM
+			li		t1, 1
+			sw		t1, 0(t0)
+
+DRAW.CHAR.START:	# Draw char
 			mv		a0, s2
 		
 			# Calculo da posicao do personagem na tela em relacao ao mapa
@@ -308,34 +327,20 @@ DRAW.CHAR:		# Draw char
 		
 			li		t1, 32
 			mul		a6, t0, t1
+			
+			la		t0, CHAR_WALK_ANIM
+			lw		t0, 0(t0)
+			li		t1, 32
+			mul		a7, t0, t1
 		
 			la		t0, DASHES
 			lbu		t0, 0(t0)
 			sltiu		t1, t0, 1
-			li		t0, 32
-			mul		a7, t1, t0
+			li		t0, 416
+			mul		t1, t1, t0
+			add		a7, a7, t1
 			
 			call		RENDER
-		
-			# Draw DEBUG
-			#mv		a0, s9
-		
-			#li		t0, 80
-			#li		t1, 8
-			#rem		a1, s10, t0
-			#mul		a1, a1, t1
-			#sub		a1, a1, s3
-
-			#div		a2, s10, t0
-			#mul		a2, a2, t1
-			#sub		a2, a2, s4
-		
-			#la		a3, FILE_DEBUG_SIZE
-			#la		a4, FILE_DEBUG_SIZE
-			#mv		a5, s1
-			#li		a6, 0
-			#li		a7, 0
-			#call		RENDER
 		
 GAME.SNOW:		# Draw SNOW
 			la		t3, SNOWX

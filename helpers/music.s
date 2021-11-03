@@ -62,3 +62,23 @@ SFX.DASH:		li a0, 22		# pitch
 			ecall
 			
 			ret
+
+			# morango = pitch 102 inst 117 vol 50
+SFX.MORANGO:		li a0, 102		# pitch
+			li a1, 1000		# duracao
+			li a2, 117		# instrumento
+			li a3, 90		# volume
+			li a7, 31		# define a chamada de syscall
+			ecall
+			
+			ret
+
+			# morango = pitch 102 inst 116 vol 50
+SFX.REFILL:		li a0, 102		# pitch
+			li a1, 1000		# duracao
+			li a2, 116		# instrumento
+			li a3, 90		# volume
+			li a7, 31		# define a chamada de syscall
+			ecall
+			
+			ret

@@ -46,8 +46,6 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fmul.s		ft0, ft0, ft2		# ft0 = ft0 * map width
 			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
 			add		t0, t0, t1		# t0 += t1
-			
-			mv		s10, t1
 
 			# Calculo do X
 			li		t1, HITBOX_X_FEET_OFFSET
@@ -58,8 +56,6 @@ PHYSICS.ISONGROUND:	# s0 = onGround
 			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
 			
 			add		t2, t0, t1		# t2 = t0 + t1
-			
-			add		s10, s10, t1
 						
 			lbu		t1, 0(t2)
 			bnez		t1, PHYSICS.ONGROUND
@@ -580,7 +576,10 @@ PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
 			j		PHYSICS.END
 
 PHYSICS.HIT.MORANGO:	la		t0, MORANGOS
+			lw		t1, 0(t0)
+			beqz		t1, PHYSICS.MOVE
 			sw		zero, 0(t0)
+			call		SFX.MORANGO
 			j		PHYSICS.MOVE
 
 PHYSICS.HIT.REFILL:	addi		t1, t1, -20
@@ -602,5 +601,7 @@ PHYSICS.HIT.REFILL:	addi		t1, t1, -20
 			li		a1, 2
 			call 		MIN
 			sb		a0, 0(t0)
+			
+			call		SFX.MORANGO
 			
 			j		PHYSICS.MOVE
