@@ -40,6 +40,8 @@ FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
 
 REFILL_TIMER:	.word	0, 0, 0, 0, 0, 0
 
+ALREADY_TALKED:		.byte 0
+
 .text
 START:			# Open MAPA file
 			li		a7, 1024
@@ -340,4 +342,5 @@ EXIT:			# Closes MAPA file
 .include "helpers/fases.s"
 .include "helpers/music.s"
 .include "helpers/procs.s"
+.include "helpers/talk.s"
 

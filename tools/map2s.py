@@ -78,6 +78,10 @@ if len(sys.argv) == 2:
                 elif g == 255 and b == 0:
                     linha.append('2' + str(r))
                     continue
+                # Roxo (72, 0, 255) == 9 (fogueira)
+                elif r == 72 and g == 0 and b == 255:
+                    linha.append('9')
+                    continue
                 
                 # Cor desconhecida
                 else:

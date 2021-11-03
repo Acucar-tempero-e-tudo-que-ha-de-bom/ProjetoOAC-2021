@@ -31,7 +31,7 @@ F1.TO.F2:		la		t0, MAP_TRANSITION
 
 F2.TO.F3:		la		t0, MAP_TRANSITION
 			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
+			sb		s5, 0(t0)		# map transitioning = 1
 			
 			la		t0, MAP_TARGET_POS
 			
@@ -53,7 +53,7 @@ F2.TO.F3:		la		t0, MAP_TRANSITION
 			
 			fcvt.s.w	fs2, zero
 			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+
 			la		t0, FASE_ATUAL
 			li		t1, 3
 			sb		t1, 0(t0)		# fase atual = 5
@@ -75,7 +75,7 @@ F3.TO.F4:		la		t0, MAP_TRANSITION
 			
 			li		t1, F3_TO_F4_TARGET_Y
 			sh		t1, 2(t0)		# target y
-			
+
 			la		t0, RESPAWN_POS
 			
 			li		t1, F3_TO_F4_CHAR_X
