@@ -14,8 +14,8 @@
 .eqv SCREEN_HEIGHT		180
 
 # Tamanho do mapa (mapa.bin)
-.eqv MAPA_WIDTH			640
-.eqv MAPA_HEIGHT		544
+.eqv MAPA_WIDTH			1320
+.eqv MAPA_HEIGHT		728
 
 # Tamanho do personagem (char.bin)
 .eqv CHAR_WIDTH			32
@@ -75,8 +75,8 @@
 .eqv HITBOX_X_TOP_OFFSET	12
 .eqv HITBOX_Y_TOP_OFFSET	22
 
-.eqv HITBOX_MAP_WIDTH		80
-.eqv HITBOX_MAP_HEIGHT		45
+.eqv HITBOX_MAP_WIDTH		165
+.eqv HITBOX_MAP_HEIGHT		91
 
 #
 # Dash
@@ -98,13 +98,25 @@
 #
 
 # Fase 1 para Fase 2
-.eqv F1_TO_F2_TARGET_X		320
-.eqv F1_TO_F2_TARGET_Y		180
-.eqv F1_TO_F2_CHAR_X		320
-.eqv F1_TO_F2_CHAR_Y		296
+.eqv F1_TO_F2_TARGET_X		1016
+.eqv F1_TO_F2_TARGET_Y		360
+.eqv F1_TO_F2_CHAR_X		1016
+.eqv F1_TO_F2_CHAR_Y		480
 
 # Fase 2 para Fase 3
-.eqv F2_TO_F3_TARGET_X		256
-.eqv F2_TO_F3_TARGET_Y		0
-.eqv F2_TO_F3_CHAR_X		544
-.eqv F2_TO_F3_CHAR_Y		64
+.eqv F2_TO_F3_TARGET_X		952
+.eqv F2_TO_F3_TARGET_Y		184
+.eqv F2_TO_F3_CHAR_X		1240
+.eqv F2_TO_F3_CHAR_Y		248
+
+# Fase 3 para Fase 4
+.eqv F3_TO_F4_TARGET_X		656
+.eqv F3_TO_F4_TARGET_Y		0
+.eqv F3_TO_F4_CHAR_X		936
+.eqv F3_TO_F4_CHAR_Y		104
+
+# Fase 4 para Fase 5
+.eqv F4_TO_F5_TARGET_X		304
+.eqv F4_TO_F5_TARGET_Y		0
+.eqv F4_TO_F5_CHAR_X		600
+.eqv F4_TO_F5_CHAR_Y		128

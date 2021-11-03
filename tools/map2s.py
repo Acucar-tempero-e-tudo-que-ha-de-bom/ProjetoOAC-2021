@@ -70,6 +70,14 @@ if len(sys.argv) == 2:
                 elif r == 0 and g == 255 and b == 0:
                     linha.append('6')
                     continue
+                # Azul (0, 150, 255) == 7 (fase 3 para fase 4)
+                elif r == 0 and g == 150 and b == 255:
+                    linha.append('7')
+                    continue
+                # Amarelo (255, 255, 0) == 8 (fase 4 para fase 5)
+                elif r == 255 and g == 255 and b == 0:
+                    linha.append('8')
+                    continue
                 # Cor desconhecida
                 else:
                     print(f"Cor desconhecida: {r} {g} {b}")

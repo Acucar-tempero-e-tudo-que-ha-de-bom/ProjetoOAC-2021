@@ -97,7 +97,7 @@ PHYSICS.DASHTIMER:	# Reset dashes
 			beqz		s0, PHYSICS.CAN.DASH	# if not onGround, continue
 			
 			la		t0, DASHES
-			li		t1, 1
+			li		t1, 10
 			sb		t1, 0(t0)		# dashes = 1
 			
 PHYSICS.CAN.DASH:	la		t0, DASH
@@ -419,6 +419,9 @@ PHYSICS.COLL.X.LEFT:	li		t1, HITBOX_Y_LEFT_OFFSET
 PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
 			
+			li		t2, 8
+			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
+			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 			
@@ -512,6 +515,12 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 5
 			beq		t1, t2, PHYSICS.HIT.F2.TO.F3
 			
+			li		t2, 7
+			beq		t1, t2, PHYSICS.HIT.F3.TO.F4
+			
+			li		t2, 8
+			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
+			
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
@@ -593,6 +602,63 @@ PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
 			li		t1, F2_TO_F3_CHAR_Y
 			fcvt.s.w	fs1, t1			# char y
 			sh		t1, 2(t0)
+			
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+			
+			j		PHYSICS.END
+
+PHYSICS.HIT.F3.TO.F4:	la		t0, MAP_TRANSITION
+			li		s5, 1
+			sb		s5, 0(t0)		# map trasitioning = 1
+			
+			la		t0, MAP_TARGET_POS
+			
+			li		t1, F3_TO_F4_TARGET_X
+			sh		t1, 0(t0)		# target x
+			
+			li		t1, F3_TO_F4_TARGET_Y
+			sh		t1, 2(t0)		# target y
+			
+			la		t0, RESPAWN_POS
+			
+			li		t1, F3_TO_F4_CHAR_X
+			fcvt.s.w	fs0, t1			# char x
+			sh		t1, 0(t0)
+			
+			li		t1, F3_TO_F4_CHAR_Y
+			fcvt.s.w	fs1, t1			# char y
+			sh		t1, 2(t0)
+			
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+			
+			j		PHYSICS.END
+
+PHYSICS.HIT.F4.TO.F5:	la		t0, MAP_TRANSITION
+			li		s5, 1
+			sb		s5, 0(t0)		# map trasitioning = 1
+			
+			la		t0, MAP_TARGET_POS
+			
+			li		t1, F4_TO_F5_TARGET_X
+			sh		t1, 0(t0)		# target x
+			
+			li		t1, F4_TO_F5_TARGET_Y
+			sh		t1, 2(t0)		# target y
+			
+			la		t0, RESPAWN_POS
+			
+			li		t1, F4_TO_F5_CHAR_X
+			fcvt.s.w	fs0, t1			# char x
+			sh		t1, 0(t0)
+			
+			li		t1, F4_TO_F5_CHAR_Y
+			fcvt.s.w	fs1, t1			# char y
+			sh		t1, 2(t0)
+			
+			la		t0, FIXED_MAP
+			sb		zero, 0(t0)
 			
 			fcvt.s.w	fs2, zero
 			fcvt.s.w	fs3, zero		# zeroes char speed

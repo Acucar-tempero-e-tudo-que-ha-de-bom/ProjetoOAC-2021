@@ -9,7 +9,7 @@
 # x, y
 #
 
-CHAR_POS:	.float 8, 464
+CHAR_POS:	.float 704, 648
 
 CHAR_DIR:	.byte 0		# right: 0, left: 1
 
@@ -28,13 +28,13 @@ DASHING:	.byte 0		# is the char dashing?
 
 SNOWX:		.half 0		# snow effect x
 
-MAP_POS:	.half 0, 352	# current map position
+MAP_POS:	.half 696, 536	# current map position
 MAP_TARGET_POS:	.half 0, 0	# final map pos
 
 FIXED_MAP:	.byte 1		# follow char = 0, fixed pos = 1
 MAP_TRANSITION:	.byte 0		# is map transitioning?
 
-RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
+RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
 .text		
 			# Open MAPA file
@@ -58,11 +58,6 @@ RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
 			la		a0, FILE_SNOW
 			ecall
 			mv		s8, a0
-
-			# Open REFILL file
-			la		a0, FILE_REFILL
-			ecall
-			mv		s6, a0
 
 			li		s1, 1
 		
@@ -156,7 +151,7 @@ GAME.RNDR.MAP:		la		t0, FIXED_MAP
 			bnez		t0, GAME.FIXED.MAP
 
 			# Calcular posicao do mapa de acordo com o personagem
-			# O personagem deve ficar sempre que possï¿½vel no centro da tela
+			# O personagem deve ficar sempre que possível no centro da tela
 			# Calculo do x
 GAME.DYN.MAP:		fcvt.w.s	a0, fs0			# a0 = char x
 
@@ -187,7 +182,7 @@ GAME.FIXED.MAP:		la		t0, MAP_POS
 			lhu		s4, 2(t0)
 
 GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
-			# os calculos pros argumentos a6-a7 sï¿½o definidos acima
+			# os calculos pros argumentos a6-a7 são definidos acima
 			mv		a0, s0
 			li		a1, 0
 			li		a2, 0
@@ -199,20 +194,7 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			call		RENDER
 		
 			bnez		s5, GAME.SNOW
-
-			# Draw refill
-			mv 		a0, s6
-			li 		a1, 200
-			sub 	a1, a1, s3	# x - offset do x
-			li 		a2, 422
-			sub 	a2, a2, s4	# y - offset do y
-			la		a3, FILE_REFILL_SIZE
-			mv		a4, a3
-			mv		a5, s1
-			mv		a6, zero
-			mv		a7, zero
-			call 		RENDER
-			
+		
 			# Draw char
 			mv		a0, s2
 		
