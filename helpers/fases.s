@@ -62,6 +62,10 @@ F2.TO.F3:		la		t0, MAP_TRANSITION
 			li		t1, 1
 			sb		t1, 0(t0)		# direcao do char = esquerda
 			
+			la		t0, GHOST_ACTIVE
+			li		t1, 1
+			sb		t1, 0(t0)
+			
 			ret
 
 F3.TO.F4:		la		t0, MAP_TRANSITION
@@ -96,6 +100,9 @@ F3.TO.F4:		la		t0, MAP_TRANSITION
 			la		t0, CHAR_DIR
 			li		t1, 1
 			sb		t1, 0(t0)		# direcao do char = esquerda
+			
+			la		t0, GHOST_ACTIVE
+			sb		zero, 0(t0)
 			
 			ret
 
@@ -134,5 +141,24 @@ F4.TO.F5:		la		t0, MAP_TRANSITION
 			la		t0, CHAR_DIR
 			li		t1, 1
 			sb		t1, 0(t0)		# direcao do char = esquerda
+			
+			ret
+
+DEATH:			la		t0, RESPAWN_POS
+
+			lhu		t1, 0(t0)
+			fcvt.s.w	fs0, t1			# respawn x pos
+			
+			lhu		t1, 2(t0)
+			fcvt.s.w	fs1, t1			# respawn y pos
+
+			fcvt.s.w	fs2, zero
+			fcvt.s.w	fs3, zero		# zeroes char speed
+			
+			la		t0, GHOST_POS
+			li		t1, 1096
+			sh		t1, 0(t0)
+			li		t1, 184
+			sh		t1, 2(t0)
 			
 			ret

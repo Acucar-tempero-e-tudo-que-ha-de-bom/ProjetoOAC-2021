@@ -20,3 +20,6 @@ FILE_REFILL_SIZE:	.half 16, 16
 
 FILE_MORANGO:		.string "sprites/morango.bin"
 FILE_MORANGO_SIZE:	.half 16, 16
+
+FILE_GHOST:		.string "sprites/ghost.bin"
+FILE_GHOST_SIZE:	.half 24, 24

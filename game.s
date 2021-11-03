@@ -44,6 +44,9 @@ MORANGOS:	.word 1
 
 CHAR_WALK_ANIM:	.word 0
 
+GHOST_ACTIVE:	.byte 0
+GHOST_POS:	.half 1096, 184
+
 .text
 START:			# Open MAPA file
 			li		a7, 1024
@@ -71,6 +74,11 @@ START:			# Open MAPA file
 			la		a0, FILE_MORANGO
 			ecall
 			mv		s7, a0
+			
+			# Open GHOST file
+			la		a0, FILE_GHOST
+			ecall
+			mv		s9, a0
 
 			li		s1, 1
 		
@@ -341,6 +349,67 @@ DRAW.CHAR.START:	# Draw char
 			add		a7, a7, t1
 			
 			call		RENDER
+			
+GAME.GHOST:		la		t0, GHOST_ACTIVE
+			lb		t1, 0(t0)
+			beqz		t1, GAME.SNOW
+			
+			mv		a0, zero
+			li		a1, 100
+			li		a7, 42
+			ecall
+			
+			li		t1, 70
+			blt		a0, t1, GAME.GHOST.NOTHING
+			
+			la		t0, GHOST_POS
+			lhu		a0, 0(t0)
+			fcvt.w.s	a1, fs0
+			li		a2, 1
+			call		APPROACH.I
+			mv		t3, a0		# t3 = ghost x
+			
+			lhu		a0, 2(t0)
+			fcvt.w.s	a1, fs1
+			li		a2, 1
+			call		APPROACH.I
+			mv		t4, a0		# t4 = ghost y
+			
+			sh		t3, 0(t0)
+			sh		t4, 2(t0)
+			
+			j		GAME.DRAW.GHOST
+
+GAME.GHOST.NOTHING:	la		t0, GHOST_POS
+			lhu		t3, 0(t0)
+			lhu		t4, 2(t0)
+			
+GAME.DRAW.GHOST:	mv		a0, s9
+			sub		a1, t3, s3
+			sub		a2, t4, s4
+			la		a3, FILE_GHOST_SIZE
+			mv		a4, a3
+			mv		a5, s1
+			mv		a6, zero
+			mv		a7, zero
+			call		RENDER
+
+GAME.GHOST.COLL.X:	la		t0, GHOST_POS
+			lhu		t1, 0(t0)
+			fcvt.w.s	t2, fs0
+			addi		t2, t2, -12
+			blt		t1, t2, GAME.SNOW
+			addi		t2, t2, 32
+			bgt		t1, t2, GAME.SNOW
+			
+			lhu		t1, 2(t0)
+			fcvt.w.s	t2, fs1
+			addi		t2, t2, -8
+			blt		t1, t2, GAME.SNOW
+			addi		t2, t2, 40
+			bgt		t1, t2, GAME.SNOW
+			
+			call		DEATH
 		
 GAME.SNOW:		# Draw SNOW
 			la		t3, SNOWX

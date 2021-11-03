@@ -546,17 +546,7 @@ PHYSICS.END:		lw		s0, 8(sp)		# restaura s0
 
 			ret
 
-PHYSICS.HIT.SPIKE:	la		t0, RESPAWN_POS
-
-			lhu		t1, 0(t0)
-			fcvt.s.w	fs0, t1			# respawn x pos
-			
-			lhu		t1, 2(t0)
-			fcvt.s.w	fs1, t1			# respawn y pos
-
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-
+PHYSICS.HIT.SPIKE:	call		DEATH
 			j		PHYSICS.END
 
 PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
