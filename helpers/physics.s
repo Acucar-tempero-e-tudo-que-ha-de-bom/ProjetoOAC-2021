@@ -565,13 +565,26 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
 			
-PHYSICS.HIT.REFILL:	# Coloca mais um dash pro personagem limitando a 2 dashes
+PHYSICS.HIT.REFILL:	addi		t1, t1, -20
+			li		t0, 4
+			mul		t1, t1, t0
+			
+			la		t0, REFILL_TIMER
+			add		t0, t0, t1
+			lw		t1, 0(t0)
+			bnez		t1, PHYSICS.MOVE
+			
+			li		t1, 70
+			sw		t1, 0(t0)
+			
+			# Coloca mais um dash pro personagem limitando a 2 dashes
 			la		t0, DASHES
 			lb		t1, 0(t0)
 			addi 		a0, t1, 1
 			li		a1, 2
 			call 		MIN
 			sb		a0, 0(t0)
+			
 			j		PHYSICS.MOVE
 
 PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
