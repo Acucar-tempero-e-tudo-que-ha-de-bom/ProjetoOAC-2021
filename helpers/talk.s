@@ -87,6 +87,10 @@ TALK:
 		li		t1, 1
 		sb		t1, 0(t0)
 		
+		la		t0, GHOST_ACTIVE
+		li		t1, 1
+		sb		t1, 0(t0)
+		
 		lw		ra, 0(sp)
 		addi		sp, sp, 4
 		ret

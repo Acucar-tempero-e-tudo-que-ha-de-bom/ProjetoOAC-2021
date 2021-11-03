@@ -561,9 +561,10 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
 			
-PHYSICS.HIT.TALK:	
+PHYSICS.HIT.TALK:	fcvt.s.w	fs3, zero		# Speed.Y = 0
+
 			la		t0, ALREADY_TALKED
-			lw		t0, 0(t0)
+			lbu		t0, 0(t0)
 			bnez		t0, PHYSICS.MOVE
 			
 			call		TALK

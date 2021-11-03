@@ -46,7 +46,8 @@ CHAR_WALK_ANIM:	.word 0
 
 GHOST_ACTIVE:	.byte 0
 GHOST_POS:	.half 1096, 184
-ALREADY_TALKED:		.byte 0
+
+ALREADY_TALKED:	.byte 0
 
 .text
 START:			# Open MAPA file

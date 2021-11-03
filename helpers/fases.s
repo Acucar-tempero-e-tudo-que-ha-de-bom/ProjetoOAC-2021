@@ -62,10 +62,6 @@ F2.TO.F3:		la		t0, MAP_TRANSITION
 			li		t1, 1
 			sb		t1, 0(t0)		# direcao do char = esquerda
 			
-			la		t0, GHOST_ACTIVE
-			li		t1, 1
-			sb		t1, 0(t0)
-			
 			ret
 
 F3.TO.F4:		la		t0, MAP_TRANSITION
