@@ -46,6 +46,7 @@ CHAR_WALK_ANIM:	.word 0
 
 GHOST_ACTIVE:	.byte 0
 GHOST_POS:	.half 1096, 184
+ALREADY_TALKED:		.byte 0
 
 .text
 START:			# Open MAPA file
@@ -177,7 +178,7 @@ GAME.RNDR.MAP:		la		t0, FIXED_MAP
 			bnez		t0, GAME.FIXED.MAP
 
 			# Calcular posicao do mapa de acordo com o personagem
-			# O personagem deve ficar sempre que possível no centro da tela
+			# O personagem deve ficar sempre que possï¿½vel no centro da tela
 			# Calculo do x
 GAME.DYN.MAP:		fcvt.w.s	a0, fs0			# a0 = char x
 
@@ -208,7 +209,7 @@ GAME.FIXED.MAP:		la		t0, MAP_POS
 			lhu		s4, 2(t0)
 
 GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
-			# os calculos pros argumentos a6-a7 são definidos acima
+			# os calculos pros argumentos a6-a7 sï¿½o definidos acima
 			mv		a0, s0
 			li		a1, 0
 			li		a2, 0
@@ -467,4 +468,5 @@ EXIT:			# Closes MAPA file
 .include "helpers/fases.s"
 .include "helpers/music.s"
 .include "helpers/procs.s"
+.include "helpers/talk.s"
 

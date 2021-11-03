@@ -418,6 +418,8 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			beq		t1, t2, PHYSICS.HIT.SPIKE
 			li		t2, 20			# refill = 20
 			bge		t1, t2, PHYSICS.HIT.REFILL
+			li		t2, 9			# dialogo = 9
+			beq		t1, t2, PHYSICS.HIT.TALK
 			
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
@@ -512,6 +514,9 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 3			# trampolim = 3
 			beq		t1, t2, PHYSICS.HIT.TRAMPOLIM
 			
+			li		t2, 9			# dialogo = 9
+			beq		t1, t2, PHYSICS.HIT.TALK
+			
 			li		t2, 4
 			beq		t1, t2, PHYSICS.HIT.F1.TO.F2
 			
@@ -555,6 +560,14 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 
 PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
+			
+PHYSICS.HIT.TALK:	
+			la		t0, ALREADY_TALKED
+			lw		t0, 0(t0)
+			bnez		t0, PHYSICS.MOVE
+			
+			call		TALK
+			j		PHYSICS.MOVE
 
 PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
 			j		PHYSICS.END
