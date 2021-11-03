@@ -1,0 +1,7 @@
+Comandos:
+	movimentação: w,a,s,d,q,e
+	arranque: W, A, S, D, Q, E, Z, C
+	passar diálogo: j
+	passar fase: t
+	voltar pro spawn: o
+	aumentar 10 arranques no ar: y (se tocar no chão, reseta pra 1)
