@@ -147,6 +147,8 @@ PHYSICS.START.DASH:	la		t0, DASHES
 			
 			fmul.s		fs3, ft1, ft0		# Speed.X = dash y speed
 			
+			call		SFX.DASH
+			
 			j 		PHYSICS.COLLISION
 			
 			# Horizontal Movement
@@ -421,6 +423,9 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 6			# refill = 6
 			beq		t1, t2, PHYSICS.HIT.REFILL
 			
+			li		t2, 8
+			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
+			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
 			flw		fs4, 0(t0)		# jumpGraceTimer = JumpGraceTime
 			
@@ -517,6 +522,13 @@ PHYSICS.COLL.Y.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 6			# refill = 6
 			beq		t1, t2, PHYSICS.HIT.REFILL
 									
+			
+			li		t2, 7
+			beq		t1, t2, PHYSICS.HIT.F3.TO.F4
+			
+			li		t2, 8
+			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
+			
 			fcvt.s.w	fs3, zero		# Speed.Y = 0
 
 PHYSICS.MOVE:		# MoveH
@@ -550,58 +562,7 @@ PHYSICS.HIT.TRAMPOLIM:	li		t0, TRAMPOLIM_SPEED
 			fcvt.s.w	fs3, t0			# ft0 = dash speed
 			j		PHYSICS.MOVE
 
-PHYSICS.HIT.F1.TO.F2:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F1_TO_F2_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F1_TO_F2_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F1_TO_F2_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F1_TO_F2_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
-			j		PHYSICS.END
-
-PHYSICS.HIT.F2.TO.F3:	la		t0, MAP_TRANSITION
-			li		s5, 1
-			sb		s5, 0(t0)		# map trasitioning = 1
-			
-			la		t0, MAP_TARGET_POS
-			
-			li		t1, F2_TO_F3_TARGET_X
-			sh		t1, 0(t0)		# target x
-			
-			li		t1, F2_TO_F3_TARGET_Y
-			sh		t1, 2(t0)		# target y
-			
-			la		t0, RESPAWN_POS
-			
-			li		t1, F2_TO_F3_CHAR_X
-			fcvt.s.w	fs0, t1			# char x
-			sh		t1, 0(t0)
-			
-			li		t1, F2_TO_F3_CHAR_Y
-			fcvt.s.w	fs1, t1			# char y
-			sh		t1, 2(t0)
-			
-			fcvt.s.w	fs2, zero
-			fcvt.s.w	fs3, zero		# zeroes char speed
-			
+PHYSICS.HIT.F1.TO.F2:	call		F1.TO.F2
 			j		PHYSICS.END
 			
 PHYSICS.HIT.REFILL:	# Coloca mais um dash pro personagem limitando a 2 dashes
@@ -612,3 +573,12 @@ PHYSICS.HIT.REFILL:	# Coloca mais um dash pro personagem limitando a 2 dashes
 			call 		MIN
 			sb		a0, 0(t0)
 			j		PHYSICS.MOVE
+
+PHYSICS.HIT.F2.TO.F3:	call		F2.TO.F3
+			j		PHYSICS.END
+
+PHYSICS.HIT.F3.TO.F4:	call		F3.TO.F4
+			j		PHYSICS.END
+
+PHYSICS.HIT.F4.TO.F5:	call		F4.TO.F5
+			j		PHYSICS.END

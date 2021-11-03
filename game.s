@@ -9,11 +9,11 @@
 # x, y
 #
 
-CHAR_POS:	.float 8, 464
+CHAR_POS:	.float 704, 648
 
 CHAR_DIR:	.byte 0		# right: 0, left: 1
 
-PLACEHOLDER:	.byte 0, 0, 0	# IGNORE
+PLACEHOLDER:	.byte 0		# IGNORE
 
 MOVEX:		.byte 0		# left: -1, right: 1
 MOVEY:		.byte 0		# up: -1, down: 1
@@ -28,16 +28,18 @@ DASHING:	.byte 0		# is the char dashing?
 
 SNOWX:		.half 0		# snow effect x
 
-MAP_POS:	.half 0, 352	# current map position
+MAP_POS:	.half 696, 536	# current map position
 MAP_TARGET_POS:	.half 0, 0	# final map pos
 
 FIXED_MAP:	.byte 1		# follow char = 0, fixed pos = 1
 MAP_TRANSITION:	.byte 0		# is map transitioning?
 
-RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
+RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
-.text		
-			# Open MAPA file
+FASE_ATUAL:	.byte 1		# fase atual (1, 2, 3, 4, 5)
+
+.text
+START:			# Open MAPA file
 			li		a7, 1024
 			la		a0, FILE_MAP
 			li		a1, 0
@@ -59,11 +61,6 @@ RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
 			ecall
 			mv		s8, a0
 
-			# Open REFILL file
-			la		a0, FILE_REFILL
-			ecall
-			mv		s6, a0
-
 			li		s1, 1
 		
 			la		t0, CHAR_POS
@@ -80,6 +77,8 @@ RESPAWN_POS:	.half 8, 464	# respawn pos (x, y)
 		
 			li		t0, MAX_FALL
 			fcvt.s.w	fs7, t0			# fs7 = max fall
+			
+			call		MUSIC.SETUP
 
 			#
 			# Registradores que devem permanecer durante o loop
@@ -110,7 +109,9 @@ GAME.LOOP:		#
 			fcvt.s.w	ft0, t1			# ft0 = 1000
 			fcvt.s.w	fa7, t0			# fa7 = delta time (in ms)
 			fdiv.s		fa7, fa7, ft0		# fa7 /= 1000 (delta time in seconds)
-		
+			
+			call		MUSIC.PLAY
+			
 			la		t0, MAP_TRANSITION
 			lb		s5, 0(t0)
 			bnez		s5, GAME.MAP.MOVE
@@ -125,7 +126,7 @@ GAME.LOOP:		#
 GAME.MAP.MOVE:		la		t0, MAP_POS
 			la		t1, MAP_TARGET_POS
 			li		a2, 2
-		
+
 			lhu		a0, 0(t0)
 			lhu		a1, 0(t1)
 			call		APPROACH.I
@@ -138,48 +139,48 @@ GAME.MAP.MOVE:		la		t0, MAP_POS
 
 			sh		s3, 0(t0)
 			sh		s4, 2(t0)
-		
+
 			la		t1, MAP_TARGET_POS
 			lhu		t0, 0(t1)
 			bne		s3, t0, GAME.RENDER	# map x != target x
-			
+
 			lhu		t0, 2(t1)
 			bne		s4, t0, GAME.RENDER	# map y != target y
-			
+
 			# if both are equal
 			la		t0, MAP_TRANSITION
 			mv		s5, zero
 			sb		s5, 0(t0)		# transition is done
-		
+
 GAME.RNDR.MAP:		la		t0, FIXED_MAP
 			lb		t0, 0(t0)
 			bnez		t0, GAME.FIXED.MAP
 
 			# Calcular posicao do mapa de acordo com o personagem
-			# O personagem deve ficar sempre que possï¿½vel no centro da tela
+			# O personagem deve ficar sempre que possível no centro da tela
 			# Calculo do x
 GAME.DYN.MAP:		fcvt.w.s	a0, fs0			# a0 = char x
 
 			addi		a0, a0, MAP_OFFSET_X	# a0 = char x - offset x do mapa (o mapa fica x pixels pra esquerda do personagem)
 			mv		a1, zero		# a1 = 0
 			call		MAX			# faz um MAX entre o resultado da conta e 0 (garante que o x do mapa seja >= 0)
-		
+
 			li		a1, MAP_MAX_X		# a1 = maximo que o mapa pode ir no eixo X
 			call		MIN			# faz um MIN entre o resultado da conta e o MAXIMO que o mapa pode ir no eixo X
-		
+
 			mv		s3, a0			# move o resultado pra s3
-		
+
 			# Calculo do y
 			fcvt.w.s	a0, fs1			# a0 = char y
 			addi		a0, a0, MAP_OFFSET_Y	# a0 = char y - offset y do mapa (o mapa fica x pixels pra cima do personagem)
 			mv		a1, zero		# a1 = zero
 			call		MAX			# faz um MAX entre o resultado da conta e 0 (garante que o y do mapa seja >= 0)
-		
+
 			li		a1, MAP_MAX_Y		# a1 = maximo que o mapa pode ir no eixo Y
 			call		MIN			# faz um MIN entre o resultado da conta e o MAXIMO que o mapa pode ir no eixo Y
-		
+
 			mv		s4, a0			# move o resultado pra s4
-		
+
 			j		GAME.RENDER
 
 GAME.FIXED.MAP:		la		t0, MAP_POS
@@ -187,7 +188,7 @@ GAME.FIXED.MAP:		la		t0, MAP_POS
 			lhu		s4, 2(t0)
 
 GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
-			# os calculos pros argumentos a6-a7 sï¿½o definidos acima
+			# os calculos pros argumentos a6-a7 são definidos acima
 			mv		a0, s0
 			li		a1, 0
 			li		a2, 0
@@ -199,20 +200,7 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			call		RENDER
 		
 			bnez		s5, GAME.SNOW
-
-			# Draw refill
-			mv 		a0, s6
-			li 		a1, 200
-			sub 	a1, a1, s3	# x - offset do x
-			li 		a2, 422
-			sub 	a2, a2, s4	# y - offset do y
-			la		a3, FILE_REFILL_SIZE
-			mv		a4, a3
-			mv		a5, s1
-			mv		a6, zero
-			mv		a7, zero
-			call 		RENDER
-			
+		
 			# Draw char
 			mv		a0, s2
 		
@@ -312,5 +300,7 @@ EXIT:			# Closes MAPA file
 .include "helpers/input.s"
 .include "helpers/render.s"
 .include "helpers/physics.s"
+.include "helpers/fases.s"
+.include "helpers/music.s"
 .include "helpers/procs.s"
 
