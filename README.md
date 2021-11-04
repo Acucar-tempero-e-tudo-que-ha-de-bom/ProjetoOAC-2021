@@ -56,7 +56,7 @@ Download the repository into a directory and run the `game.s` file using `fpgrar
 
 ---
 
-To run the game under Linux:
+To run the game on Linux:
 
 You need to download the Linux version of [FPGRARS](https://www.github.com/LeoRiether/FPGRARS) and then run `game.s` with the FPGRARS file.
 
