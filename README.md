@@ -1,6 +1,6 @@
 # Projeto Final - Celeste
 
-Projeto final da disciplina de Organização e Arquitetura de Computadores realizado no semestre 2021.1 pelos alunos Ana Sofia Schweizer Sivestre, Davi de Jesus Almeida Paturi e Victor Hugo França Lisboa.
+Projeto final da disciplina de Organização e Arquitetura de Computadores realizado no semestre 2021.1 pelos alunos Ana Sofia Schweizer Sivestre, Davi Jesus de Almeida Paturi e Victor Hugo França Lisboa.
 
 O jogo é uma implementação em Assembly RISC-V 32IMF que se baseia do [jogo original Celeste](http://www.celestegame.com/) e foi idealizado para ser executado no programa [FPGRARS](https://www.github.com/LeoRiether/FPGRARS) do Leo Riether.
 
