@@ -424,7 +424,7 @@ PHYSICS.COLL.X.HIT:	li		t2, 2			# espinhos = 2
 			li		t2, 8
 			beq		t1, t2, PHYSICS.HIT.F4.TO.F5
 			
-			li		t2, 9
+			li		t2, 10
 			beq		t1, t2, PHYSICS.HIT.MORANGO
 			
 			la		t0, JUMPGRACETIME	# resets grace timer if onGround
