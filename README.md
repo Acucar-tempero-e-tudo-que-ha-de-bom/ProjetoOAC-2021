@@ -39,3 +39,47 @@ j | Passa caixa de diálogo
 t | Pula para próxima fase
 o | Retorna ao início da fase
 y | Recebe 10 arranques quando no ar
+
+---
+
+# Final Project - Celeste
+
+Final project for the subject Computer Architecture and Organization made in the semester 2021.1 by the students Ana Sofia Schweizer Sivestre, Davi Jesus de Almeida Paturi and Victor Hugo França Lisboa.
+
+The game is a 32IMF RISC-V Assembly implementation based on the [original Celeste game](http://www.celestegame.com/) and was designed to run on Leo Riether's [FPGRARS](https://www.github.com/LeoRiether/FPGRARS) program.
+
+---
+
+To run the game on Windows:
+
+Download the repository into a directory and run the `game.s` file using `fpgrars.exe` (by dragging `game.s` into `fpgrars.s` or running it from the command line).
+
+---
+
+To run the game under Linux:
+
+You need to download the Linux version of [FPGRARS](https://www.github.com/LeoRiether/FPGRARS) and then run `game.s` with the FPGRARS file.
+
+---
+
+#### How to play:
+(Important to note that the controls are _case sensitive_, i.e. there is case difference)
+
+Key | Action
+:---: | :---:
+w | Jump up
+a | Move left
+d | Walk right
+q | Left diagonal jump
+e | Right diagonal jump
+W | Dash Up
+A | Left Dash
+D | Right Dash
+Q | Left upper diagonal dash
+E | Right upper diagonal dash
+Z | Left lower diagonal dash
+C | Right lower diagonal dash
+j | Go to next dialog box
+t | Jump to the next level
+o | Respawn
+y | Get 10 dashes when in mid-air
