@@ -24,14 +24,14 @@ MUSIC.PLAY:		la		a0, MUSIC_STATUS
 			lw		t0, 0(a0)
 			beqz		t0, MUSIC.PLAY.NOTE
 
-			csrr		t1, 3073		# current time
+			csrr		t1, time		# current time
 			bltu		t1, t0, MUSIC.RET	# if (now < next note) do nothing ELSE play note
 
 MUSIC.PLAY.NOTE:	lw		t0, 4(a0)		# t0 = current note address
 			lw		t1, 0(t0)		# nota
 			lw		t2, 4(t0)		# duracao
 
-			beqz		t1, MUSIC.LAST.PLAYED	# nota == 0, só espera
+			beqz		t1, MUSIC.LAST.PLAYED	# nota == 0, sï¿½ espera
 
 			mv		t3, a0		# salva a0
 
@@ -44,11 +44,11 @@ MUSIC.PLAY.NOTE:	lw		t0, 4(a0)		# t0 = current note address
 
 MUSIC.LAST.PLAYED:	beqz		t2, MUSIC.SETUP	# nota == 0 e duracao == 0, recomeca
 
-			csrr		t3, 3073	# current time
+			csrr		t3, time	# current time
 			add		t3, t3, t2	# current time + note duration = next note time
 			sw		t3, 0(a0)	# save next note time
 
-			addi		t0, t0, 8	# incrementa endereço da proxima nota
+			addi		t0, t0, 8	# incrementa endereï¿½o da proxima nota
 			sw		t0, 4(a0)	# salva proxima nota
 
 MUSIC.RET:		ret

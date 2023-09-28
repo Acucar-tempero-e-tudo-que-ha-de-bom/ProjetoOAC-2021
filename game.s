@@ -122,7 +122,7 @@ GAME.LOOP:		#
 			# O framerate atual do jogo e 60 fps, mas com o passar do desenvolvimento, se o
 			# jogo ficar muito pesado, pode ser interessante diminuir esse framerate.
 			#
-			csrr		t0, 3073		# t0 = current time
+			csrr		t0, time		# t0 = current time
 			sub		t0, t0, s11		# t0 = current time - last frame time
 			li		t1, 16			# 16ms entre cada frame (1000ms/60fps)
 			bltu		t0, t1, GAME.LOOP	# enquanto n tiver passado 16ms, repete
@@ -436,7 +436,7 @@ SNOW.SAVE.X:		sh		t0, 0(t3)
 		
 			# Salva quando esse frame terminou de renderizar
 			# Usado pra garantir um framerate fixo no jogo
-			csrr		s11, 3073
+			csrr		s11, time
 		
 			# Troca de frame
 			# Agora que esta tudo renderizado pode mostrar pro usuario
