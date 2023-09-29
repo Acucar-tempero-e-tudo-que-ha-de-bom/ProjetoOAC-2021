@@ -116,10 +116,10 @@ TALK:
 		addi		sp, sp, 4
 		ret
 
-AWAIT.KEYBOARD:	li 		t1, 0xFF200000		# carrega o endereço de controle do KDMMIO
+AWAIT.KEYBOARD:	li 		t1, 0xFF200000		# carrega o endereco de controle do KDMMIO
 		lw 		t0, 0(t1)		# Le bit de Controle Teclado
    		andi 		t0, t0, 1		# mascara o bit menos significativo
-   		beq 		t0, zero, AWAIT.KEYBOARD# não tem tecla pressionada então volta ao loop
+   		beq 		t0, zero, AWAIT.KEYBOARD# nao tem tecla pressionada entao volta ao loop
 		lw 		t2, 4(t1)		# le o valor da tecla
 		li		t3, 'j'			# pular conversa
 		bne		t2, t3, AWAIT.KEYBOARD

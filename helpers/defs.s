@@ -1,7 +1,7 @@
-# Endereço do Bitmap Display
+# Endereco do Bitmap Display
 # (ja foi somado +30 na linha pra compensar a altura da tela que nao e 240)
-.eqv F0_INIT_ADDR		0xff002580
-.eqv F1_INIT_ADDR		0xff102580
+.eqv F0_INIT_ADDR		0xFF002580
+.eqv F1_INIT_ADDR		0xFF102580
 .eqv FRAME_CONTROL_ADDRESS	0xFF200604
 
 # KDMMIO
@@ -22,7 +22,7 @@
 .eqv CHAR_HEIGHT		32
 
 #
-# Offset do mapa em relação ao personagem
+# Offset do mapa em relacao ao personagem
 # Calculo pra chegar no offset:
 #	x = (largura da tela - char width) / 2
 #	y = (altura da tela - char height) / 2

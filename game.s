@@ -1,6 +1,7 @@
 .include "helpers/defs.s"
 .include "helpers/files.s"
 .include "helpers/data.s"
+.include "helpers/debug.s"
 .include "data/map_hitbox.s"
 
 .data
@@ -56,7 +57,7 @@ START:			# Open MAPA file
 			li		a1, 0
 			ecall
 			mv		s0, a0
-		
+			
 			# Open CHAR file
 			la		a0, FILE_CHAR
 			ecall
@@ -179,7 +180,7 @@ GAME.RNDR.MAP:		la		t0, FIXED_MAP
 			bnez		t0, GAME.FIXED.MAP
 
 			# Calcular posicao do mapa de acordo com o personagem
-			# O personagem deve ficar sempre que poss�vel no centro da tela
+			# O personagem deve ficar sempre que possivel no centro da tela
 			# Calculo do x
 GAME.DYN.MAP:		fcvt.w.s	a0, fs0			# a0 = char x
 
@@ -210,7 +211,7 @@ GAME.FIXED.MAP:		la		t0, MAP_POS
 			lhu		s4, 2(t0)
 
 GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
-			# os calculos pros argumentos a6-a7 s�o definidos acima
+			# os calculos pros argumentos a6-a7 sao definidos acima
 			mv		a0, s0
 			li		a1, 0
 			li		a2, 0
@@ -220,7 +221,7 @@ GAME.RENDER:		# Define os argumentos a0-a5 e desenha o mapa
 			mv		a6, s3
 			mv		a7, s4
 			call		RENDER
-		
+
 			bnez		s5, GAME.SNOW
 		
 			# Draw refill level 4

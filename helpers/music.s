@@ -31,7 +31,7 @@ MUSIC.PLAY.NOTE:	lw		t0, 4(a0)		# t0 = current note address
 			lw		t1, 0(t0)		# nota
 			lw		t2, 4(t0)		# duracao
 
-			beqz		t1, MUSIC.LAST.PLAYED	# nota == 0, s� espera
+			beqz		t1, MUSIC.LAST.PLAYED	# nota == 0, só espera
 
 			mv		t3, a0		# salva a0
 
@@ -48,7 +48,7 @@ MUSIC.LAST.PLAYED:	beqz		t2, MUSIC.SETUP	# nota == 0 e duracao == 0, recomeca
 			add		t3, t3, t2	# current time + note duration = next note time
 			sw		t3, 0(a0)	# save next note time
 
-			addi		t0, t0, 8	# incrementa endere�o da proxima nota
+			addi		t0, t0, 8	# incrementa endereco da proxima nota
 			sw		t0, 4(a0)	# salva proxima nota
 
 MUSIC.RET:		ret

@@ -3,7 +3,7 @@
 #		a0 = file descriptor				#
 #		a1 = x na tela					#
 #		a2 = y na tela					#
-#		a3 = endereço do tamanho da imagem		#
+#		a3 = endereï¿½o do tamanho da imagem		#
 #		a4 = endereco do tam. da area de desenho	#
 #		a5 = frame (0 ou 1)				#
 #		a6 = x na imagem				#
@@ -30,7 +30,7 @@ RENDER:		lhu		t1, 0(a3)
 		add		a5, t1, a5		# a5 = a5 + (320 * y) + x
 		
 		lhu		t2, 2(a4)
-		# Calculo do endereço final na tela
+		# Calculo do endereï¿½o final na tela
 		li		t1, SCREEN_WIDTH
 		mul		t1, t1, t2		# t1 = 320 * h
 		add		t1, t1, a5		# t1 = a5 + (320 * h) + w
@@ -40,7 +40,7 @@ RENDER:		lhu		t1, 0(a3)
 		
 		# t0 = offset na imagem
 		# s5 = offset na tela
-		# t1 = endereço final da tela
+		# t1 = endereï¿½o final da tela
 		
 RENDER.LOOP:	# salva a0 antes de fazer as syscalls
 		mv		t5, a0
