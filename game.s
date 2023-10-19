@@ -10,7 +10,7 @@
 # x, y
 #
 
-CHAR_POS:	.float 704, 648
+CHAR_POS:	.float 704.0, 648.0
 
 CHAR_DIR:	.byte 0		# right: 0, left: 1
 
@@ -350,7 +350,7 @@ DRAW.CHAR.START:	# Draw char
 			li		t0, 416
 			mul		t1, t1, t0
 			add		a7, a7, t1
-			
+
 			call		RENDER
 			
 GAME.GHOST:		la		t0, GHOST_ACTIVE

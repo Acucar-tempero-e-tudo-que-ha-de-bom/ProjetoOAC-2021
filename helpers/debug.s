@@ -18,6 +18,16 @@
 	recover_args()
 .end_macro
 
+.macro print_float(%r)
+	save_args()
+	
+	fmv.s fa0, %r
+	li a7, 2
+	ecall
+	
+	recover_args()
+.end_macro
+
 .macro print_space()
 	save_args()
 
